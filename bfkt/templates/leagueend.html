@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>League End</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/leagueend.css') }}">
+</head>
+<body>
+    <header>
+        <h1>League End</h1>
+    </header>
+
+    <main>
+        <!-- Winner Section -->
+        <section class="winner-section">
+            <h2>Congratulations to the Champion!</h2>
+            <img src="{{ url_for('static', filename='images/' + winner_img) }}" alt="{{ winner }} Photo" class="winner-photo">
+            <h1 class="winner-name">{{ winner }}</h1>
+            <p class="winner-year">Champion of the Year {{ year }}</p>
+        </section>
+
+        <!-- Final Standings Section -->
+        <section class="standings-section">
+            <h2>Final League Standings</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Position</th>
+                        <th>Photo</th>
+                        <th>Team Name</th>
+                        <th>Played</th>
+                        <th>Wins</th>
+                        <th>Draws</th>
+                        <th>Losses</th>
+                        <th>Goals For</th>
+                        <th>Goals Against</th>
+                        <th>Goal Difference</th>
+                        <th>Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for standing in standings %}
+                    <tr>
+                        <td>{{ standing.position }}</td>
+                        <td><img src="{{ url_for('static', filename='images/' + standing.img_name) }}" alt="Team Logo" width="150"></td>
+                        <td>{{ standing.name }}</td>
+                        <td>{{ standing.matches_played }}</td>
+                        <td>{{ standing.wins }}</td>
+                        <td>{{ standing.draws }}</td>
+                        <td>{{ standing.losses }}</td>
+                        <td>{{ standing.goals_for }}</td>
+                        <td>{{ standing.goals_against }}</td>
+                        <td>{{ standing.goal_difference }}</td>
+                        <td>{{ standing.points }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <!-- End Season Button -->
+        <section class="end-season-section">
+            <form action="{{ url_for('seasonend') }}" method="POST">
+                <button type="submit" class="end-season-button">End Season</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

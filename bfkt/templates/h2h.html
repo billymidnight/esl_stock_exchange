@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Head-to-Head Comparison</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/h2h.css') }}">
+</head>
+<body>
+    <div class="h2h-header">
+        <h1>Head-to-Head Generator</h1>
+        <div>
+            <a href="{{ url_for('statistics') }}" class="back-btn">← Back to Statistics</a>
+            {% if picked %}
+            <a href="{{ url_for('h2h_open') }}" class="change-btn">↺ Change Teams</a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if not picked %}
+    <form method="POST" action="{{ url_for('h2h_generator') }}">
+        <div class="vs-container">
+            <div class="dropdown">
+                <select name="club1" required>
+                    <option value="" disabled selected>Select Club 1</option>
+                    {% for club in clubs %}
+                        <option value="{{ club }}">{{ club }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="vs-text">VS</div>
+            <div class="dropdown">
+                <select name="club2" required>
+                    <option value="" disabled selected>Select Club 2</option>
+                    {% for club in clubs %}
+                        <option value="{{ club }}">{{ club }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="submit-btn-container">
+            <button type="submit" class="compare-btn">Compare</button>
+        </div>
+    </form>
+
+    {% else %}
+    <div class="main-h2h-container">
+        <div class="team-column">
+            <h2>{{ team1 }}</h2>
+            <img src="{{ url_for('static', filename='images/' + team1_filename) }}" class="team-logo">
+        </div>
+        <div class="vs-column">
+            <div class="vs-big">VS</div>
+            <div class="meetings">Total Meetings: {{ meetings }}</div>
+        </div>
+        <div class="team-column">
+            <h2>{{ team2 }}</h2>
+            <img src="{{ url_for('static', filename='images/' + team2_filename) }}" class="team-logo">
+        </div>
+    </div>
+
+    <div class="stats-headline-row">
+        <div class="side-label">Wins</div>
+        <div class="middle-label">Draws</div>
+        <div class="side-label">Wins</div>
+    </div>
+    
+    <div class="stats-number-row">
+        <div class="side-number">{{ t1_wins }}</div>
+        <div class="middle-number">{{ draws }}</div>
+        <div class="side-number">{{ t2_wins }}</div>
+    </div>
+    
+    <hr class="stats-divider">
+
+    <div class="stats-row">
+        <div class="stat-big">{{ t1_goals }}</div>
+        <div class="stat-center">GOALS</div>
+        <div class="stat-big">{{ t2_goals }}</div>
+    </div>
+    <hr class="stats-divider">
+
+    <div class="stats-row">
+        <div class="stat-big">
+            {% if t1_biggest_win %}
+                {{ t1_biggest_win.score }} (GW{{ t1_biggest_win.gw }})
+            {% else %}
+                –
+            {% endif %}
+        </div>
+        <div class="stat-center">BIGGEST WIN</div>
+        <div class="stat-big">
+            {% if t2_biggest_win %}
+                {{ t2_biggest_win.score }} (GW{{ t2_biggest_win.gw }})
+            {% else %}
+                –
+            {% endif %}
+        </div>
+    </div>
+
+    <hr class="stats-divider">
+
+    <div class="stats-row-small">
+        <div>
+            <p>Points: {{ t1_points }}</p>
+            <p>Position: {{ t1_position }}</p>
+            <p>Price: ${{ t1_price }}</p>
+            <p>ATH: ${{ t1_high }} (GW{{ t1_high_gw }})</p>
+            <p>Best Jump: +{{ t1_jump }}% (GW{{ t1_jump_gw }})</p>
+        </div>
+        <div>
+            <p>Points: {{ t2_points }}</p>
+            <p>Position: {{ t2_position }}</p>
+            <p>Price: ${{ t2_price }}</p>
+            <p>ATH: ${{ t2_high }} (GW{{ t2_high_gw }})</p>
+            <p>Best Jump: +{{ t2_jump }}% (GW{{ t2_jump_gw }})</p>
+        </div>
+    </div>
+
+    <div class="results-history">
+        <h2>Match History</h2>
+        {% for match in results_vector %}
+            {% set outcome = (
+                'draw' if match.home_goals == match.away_goals else
+                't1' if (match.home == team1 and match.home_goals > match.away_goals) or
+                        (match.away == team1 and match.away_goals > match.home_goals) else
+                't2'
+            ) %}
+            <div class="match-row 
+                {% if outcome == 't1' %}match-t1-win{% elif outcome == 't2' %}match-t2-win{% else %}match-draw{% endif %}">
+                <strong>GW-{{ match.gw }}:</strong> {{ match.home }} {{ match.home_goals }} - {{ match.away_goals }} {{ match.away }}
+            </div>
+        {% endfor %}
+
+    </div>
+    {% endif %}
+</body>
+</html>

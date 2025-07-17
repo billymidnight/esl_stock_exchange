@@ -1,0 +1,154 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    background-color: #333;
+    color: white;
+    padding: 15px 20px;
+}
+
+header h1 {
+    flex: 1;
+    text-align: center;
+    margin: 0;
+}
+
+.back-button {
+    color: white;
+    text-decoration: none;
+    background-color: #4CAF50;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.back-button:hover {
+    background-color: #45a049;
+}
+
+/* Toggle Button Styling */
+.toggle-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.toggle-button {
+    padding: 10px 20px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #ddd;
+    font-size: 16px;
+}
+
+.toggle-button.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.toggle-button:hover {
+    background-color: #45a049;
+}
+
+/* Bet Slip Styling */
+.bets-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.bet-slip {
+    background: linear-gradient(135deg, #f3f3f3, #e0e0e0);
+    width: 80%;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.bet-slip:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.bet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.type-label, .stake-label, .payout-label {
+    font-weight: bold;
+}
+
+.type-value {
+    margin-left: 5px;
+    color: #333;
+}
+
+.odds {
+    font-weight: bold;
+    color: #4CAF50;
+}
+
+.horse-name {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #222;
+    text-align: center;
+    margin: 10px 0;
+}
+
+.bet-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.stake-value, .payout-value {
+    color: #333;
+    font-weight: bold;
+}
+
+/* Add this to handle Moneyline bet background */
+.bet-slip.win {
+    background-color: #d4edda; /* Green for win */
+}
+
+.bet-slip.lose {
+    background-color: #f8d7da; /* Red for lose */
+}
+
+.fixture {
+    font-size: 1.2em;
+    font-style: italic;
+    margin: 5px 0;
+    color: #555;
+}
+
+.result {
+    font-size: 0.9em;
+    color: #777;
+}
+
+.winnings-label {
+    font-weight: bold;
+    color: #28a745; /* Green for winnings */
+}
+
+.winnings-value {
+    color: #28a745;
+    font-weight: bold;
+}

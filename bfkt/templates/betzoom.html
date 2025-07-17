@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BetZoom • {{ fixture.home }} vs {{ fixture.away }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/betzoom.css') }}">
+</head>
+<body>
+  <header>
+    <div class="left-header">
+      <a href="{{ url_for('show_standings') }}" class="back-btn">← Back to League</a>
+      <h1>All Bets {{ fixture.home }} vs {{ fixture.away }}</h1>
+    </div>
+    <div class="right-header">
+      <span class="bankroll">Bankroll: ${{ bankroll }}</span>
+      <span class="matchinfo">GW {{ matchday }} • Game #{{ gameno }}</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- Fixture box -->
+    <section class="fixture-box">
+      <div class="team team-home">
+        <img src="{{ url_for('static', filename='images/' + home_pic) }}" alt="{{ fixture.home }} logo" />
+        <span>{{ fixture.home }}</span>
+      </div>
+      <span class="vs">vs</span>
+      <div class="team team-away">
+        <img src="{{ url_for('static', filename='images/' + away_pic) }}" alt="{{ fixture.away }} logo" />
+        <span>{{ fixture.away }}</span>
+      </div>
+    </section>
+
+    <!-- Moneyline -->
+    <section class="market-section">
+      <h2>Moneyline</h2>
+      <div class="market-row">
+        <button class="bet-btn">
+          <div class="label">{{ fixture.home }}</div>
+          <div class="odds">
+            {% if ml_home >= 0 %}+{% endif %}{{ ml_home }}
+          </div>
+        </button>
+        <button class="bet-btn">
+          <div class="label">Draw</div>
+          <div class="odds">
+            {% if ml_draw >= 0 %}+{% endif %}{{ ml_draw }}
+          </div>
+        </button>
+        <button class="bet-btn">
+          <div class="label">{{ fixture.away }}</div>
+          <div class="odds">
+            {% if ml_away >= 0 %}+{% endif %}{{ ml_away }}
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <!-- Featured Total -->
+    <section class="market-section">
+      <h2>Featured Total ({{ featured_total }})</h2>
+      <div class="market-row">
+        <button class="bet-btn">
+          <div class="label">Over {{ featured_total }}</div>
+          <div class="odds">
+            {% if featured_total_over >= 0 %}+{% endif %}{{ featured_total_over }}
+          </div>
+        </button>
+        <button class="bet-btn">
+          <div class="label">Under {{ featured_total }}</div>
+          <div class="odds">
+            {% if featured_total_under >= 0 %}+{% endif %}{{ featured_total_under }}
+          </div>
+        </button>
+      </div>
+      <button class="toggle-collapse" onclick="toggleList('all-totals')">
+        Show All Totals ↕
+      </button>
+      <div id="all-totals" class="collapsed-list">
+        {% for hook, odds in all_home_totals.items() %}
+          <div class="market-row small">
+            <button class="bet-btn">
+              <div class="label">Over {{ hook }}</div>
+              <div class="odds">
+                {% if odds.over >= 0 %}+{% endif %}{{ odds.over }}
+              </div>
+            </button>
+            <button class="bet-btn">
+              <div class="label">Under {{ hook }}</div>
+              <div class="odds">
+                {% if odds.under >= 0 %}+{% endif %}{{ odds.under }}
+              </div>
+            </button>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Featured Spread -->
+    <section class="market-section">
+      <h2>Featured Spread ({{ featured_spread }})</h2>
+      <div class="market-row">
+        <button class="bet-btn">
+          <div class="label">{{ fixture.home }} {{ featured_spread }}</div>
+          <div class="odds">
+            {% if feat_spread_home >= 0 %}+{% endif %}{{ feat_spread_home }}
+          </div>
+        </button>
+        <button class="bet-btn">
+          {% set neg_fs = -featured_spread %}
+          <div class="label">{{ fixture.away }} {{ neg_fs }}</div>
+          <div class="odds">
+            {% if feat_spread_away >= 0 %}+{% endif %}{{ feat_spread_away }}
+          </div>
+        </button>
+      </div>
+      <button class="toggle-collapse" onclick="toggleList('all-spreads')">
+        Show All Spreads ↕
+      </button>
+      <div id="all-spreads" class="collapsed-list">
+        {% for s, ods in all_home_spreads.items() %}
+          <div class="market-row small">
+            <button class="bet-btn">
+              <div class="label">{{ fixture.home }} {{ s }}</div>
+              <div class="odds">
+                {% if ods >= 0 %}+{% endif %}{{ ods }}
+              </div>
+            </button>
+            <button class="bet-btn">
+              {% set neg_s = -s %}
+              <div class="label">{{ fixture.away }} {{ neg_s }}</div>
+              <div class="odds">
+                {% if all_away_spreads[-s] >= 0 %}+{% endif %}{{ all_away_spreads[-s] }}
+              </div>
+            </button>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Double Chance -->
+    <section class="market-section">
+      <h2>Double Chance</h2>
+      <div class="market-row">
+        <button class="bet-btn">
+          <div class="label">{{ fixture.home }}/Draw</div>
+          <div class="odds">
+            {% if dc_home_or_draw >= 0 %}+{% endif %}{{ dc_home_or_draw }}
+          </div>
+        </button>
+        <button class="bet-btn">
+          <div class="label">{{ fixture.away }}/Draw</div>
+          <div class="odds">
+            {% if dc_away_or_draw >= 0 %}+{% endif %}{{ dc_away_or_draw }}
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <!-- BTTS (Both Teams to Score) -->
+    <section class="market-section">
+      <h2>Both Teams to Score</h2>
+      <div class="market-row">
+        <button class="bet-btn">
+          <div class="label">Yes</div>
+          <div class="odds">
+            {% if btts_yes >= 0 %}+{% endif %}{{ btts_yes }}
+          </div>
+        </button>
+        <button class="bet-btn">
+          <div class="label">No</div>
+          <div class="odds">
+            {% if btts_no >= 0 %}+{% endif %}{{ btts_no }}
+          </div>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function toggleList(id) {
+      const el = document.getElementById(id);
+      el.classList.toggle('collapsed-list');
+    }
+  </script>
+</body>
+</html>

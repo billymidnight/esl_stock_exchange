@@ -1,0 +1,10 @@
+DROP TABLE status;
+DROP TABLE schedule;
+DROP TABLE matches;
+DROP TABLE standings;
+DROP TABLE bankroll;
+DROP TABLE futures_bets;
+DROP TABLE ml_bets;
+DROP TABLE participants;
+DROP TABLE noodds;
+DROP TABLE points_history;

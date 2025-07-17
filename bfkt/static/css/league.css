@@ -1,0 +1,323 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0d1117;
+    color: #c9d1d9;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1c2128;
+    color: #fff;
+    padding: 20px;
+    border-bottom: 2px solid #30363d;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.bankroll-display {
+    font-size: 18px;
+    font-weight: bold;
+    color: #00ff7f;
+    margin-right: 15px;
+    display: inline-block;
+}
+
+.schedule-button,
+.view-schedule-button {
+    background-color: #30363d;
+    color: #c9d1d9;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 16px;
+    margin-right: 10px;
+    transition: background-color 0.3s;
+    font-weight: 600;
+}
+
+.schedule-button:hover,
+.view-schedule-button:hover {
+    background-color: #58a6ff;
+}
+
+.trade-button-container {
+    text-align: center;
+    margin: 40px auto 30px;
+}
+
+.trade-button {
+    background-color: #2256ff;
+    color: white;
+    padding: 14px 28px;
+    font-size: 20px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    box-shadow: 0 4px 10px rgba(88, 166, 255, 0.2);
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.trade-button:hover {
+    background-color: #612ba0;
+    transform: scale(1.05);
+}
+
+main {
+    width: 85%;
+    margin: 0 auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: #161b22;
+}
+
+th,
+td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #30363d;
+    height: 80px;
+    color: #f0f6fc;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+img {
+    border-radius: 5px;
+    width: 100px;
+    height: auto;
+}
+
+th {
+    background-color: #21262d;
+    color: #58a6ff;
+    font-size: 17px;
+}
+
+tr:nth-child(even) {
+    background-color: #1c2128;
+}
+
+tr:hover {
+    background-color: #2d333b;
+}
+
+/* Fixture Box */
+.fixture-section {
+    background-color: #161b22;
+    padding: 25px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    border: 1px solid #30363d;
+    text-align: center;
+}
+
+.fixture-section h2 {
+    font-size: 1.6em;
+    margin-bottom: 10px;
+    color: #58a6ff;
+    font-weight: bold;
+}
+
+.fixture-details {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 15px 0;
+}
+
+.team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 20px;
+}
+
+.team-logo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+}
+
+.vs {
+    font-size: 1.6em;
+    font-weight: bold;
+    color: #fff;
+}
+
+.simulate-form {
+    margin-top: 15px;
+}
+
+.simulate-form button {
+    font-size: 18px;
+    font-weight: bold;
+    width: auto;
+    padding: 12px 30px;
+}
+
+/* Moneyline Bet Buttons */
+.bet-buttons {
+    display: flex;
+    justify-content: center;
+    margin: 15px 0;
+    gap: 28px;
+}
+
+.bet-buttons button {
+    background-color: #008628;
+    color: #f0f6fc;
+    padding: 14px 40px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 255, 128, 0.15);
+    transition: background-color 0.3s, box-shadow 0.3s, transform 0.15s ease-in-out;
+}
+
+.bet-buttons button:hover {
+    background-color: #01d146;
+    box-shadow: 0 0 12px rgba(88, 255, 166, 0.5);
+    transform: scale(1.03);
+}
+
+/* Bet Popup */
+#moneylineBetPopup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #161b22;
+    box-shadow: 0 0 10px rgba(88, 166, 255, 0.3);
+    padding: 20px;
+    z-index: 1000;
+    border-radius: 8px;
+    width: 320px;
+    color: #fff;
+}
+
+.popup-content {
+    text-align: center;
+}
+
+.popup-content h2 {
+    margin-top: 0;
+    color: #58a6ff;
+}
+
+.popup-content p {
+    margin: 10px 0;
+    font-size: 16px;
+}
+
+.popup-content form {
+    display: flex;
+    flex-direction: column;
+}
+
+.popup-content label {
+    margin-bottom: 5px;
+    color: #c9d1d9;
+}
+
+.popup-content input[type="number"] {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    background-color: #0d1117;
+    color: #fff;
+    font-size: 15px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+}
+
+.form-actions button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.form-actions button[type="submit"] {
+    background-color: #238636;
+    color: white;
+}
+
+.form-actions button[type="button"] {
+    background-color: #ff5555;
+    color: white;
+}
+
+/* Form Section */
+.form-section {
+    background-color: #161b22;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #30363d;
+}
+
+.form-section h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #58a6ff;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #c9d1d9;
+}
+
+input[type="text"],
+input[type="number"] {
+    width: calc(100% - 22px);
+    padding: 10px;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    background-color: #0d1117;
+    color: #fff;
+    outline: none;
+    font-size: 15px;
+}
+
+.simulate-form button {
+    font-size: 25px;
+    font-weight: bold;
+    width: auto;
+    padding: 12px 30px;
+    background-color: #2d61c4;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    transition: background-color 0.3s, transform 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.simulate-form button:hover {
+    background-color: #3f57e0;
+    transform: scale(1.05);
+}

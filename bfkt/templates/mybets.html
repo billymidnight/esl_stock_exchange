@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bets</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mybets.css') }}">
+    <script>
+        function toggleBets(type) {
+            if (type === 'live') {
+                document.getElementById('liveBetsContainer').style.display = 'block';
+                document.getElementById('pastBetsContainer').style.display = 'none';
+                document.getElementById('liveButton').classList.add('active');
+                document.getElementById('pastButton').classList.remove('active');
+            } else {
+                document.getElementById('liveBetsContainer').style.display = 'none';
+                document.getElementById('pastBetsContainer').style.display = 'block';
+                document.getElementById('liveButton').classList.remove('active');
+                document.getElementById('pastButton').classList.add('active');
+            }
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <a href="{{ url_for('show_standings') }}" class="back-button">Back</a>
+        <h1>My Bets</h1>
+    </header>
+
+    <main>
+        <div class="toggle-container">
+            <button id="liveButton" class="toggle-button active" onclick="toggleBets('live')">Live Bets</button>
+            <button id="pastButton" class="toggle-button" onclick="toggleBets('past')">Past Bets</button>
+        </div>
+
+        <!-- Live Bets -->
+        <div id="liveBetsContainer" class="bets-container">
+            <!-- Live Moneyline Bets -->
+            {% for bet in livemlbets %}
+            <div class="bet-slip">
+                <div class="bet-header">
+                    <span class="type-label">Type:</span>
+                    <span class="type-value">Moneyline</span>
+                    <span class="odds">{{ '+' if bet.odds > 0 }}{{ bet.odds }}</span>
+                </div>
+                <div class="horse-name">
+                    {% if bet.horse == 'home' %}
+                    {{ bet.home }}
+                    {% elif bet.horse == 'away' %}
+                    {{ bet.away }}
+                    {% else %}
+                    Draw
+                    {% endif %}
+                </div>
+                <div class="fixture">{{ bet.home }} vs {{ bet.away }}</div>
+                <div class="bet-details">
+                    <span class="stake-label">Stake:</span>
+                    <span class="stake-value">${{ bet.stake }}</span>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Live Futures Bets -->
+            {% for bet in livebets %}
+            <div class="bet-slip">
+                <div class="bet-header">
+                    <span class="type-label">Type:</span>
+                    <span class="type-value">Futures</span>
+                    <span class="odds">{{ '+' if bet.odds > 0 }}{{ bet.odds }}</span>
+                </div>
+                <div class="horse-name">{{ bet.horse }}</div>
+                <div class="bet-details">
+                    <span class="stake-label">Stake:</span>
+                    <span class="stake-value">${{ bet.stake }}</span>
+                    <span class="payout-label">Potential Payout:</span>
+                    <span class="payout-value">${{ bet.payout }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Past Bets -->
+        <div id="pastBetsContainer" class="bets-container" style="display: none;">
+            <!-- Past Moneyline Bets -->
+            {% for bet in pastmlbets %}
+            <div class="bet-slip {% if bet.winlose == 'win' %}win{% else %}lose{% endif %}">
+                <div class="bet-header">
+                    <span class="type-label">{{ bet.winlose | capitalize }}</span>
+                    <span class="type-value">Moneyline</span>
+                    <span class="odds">{{ '+' if bet.odds > 0 }}{{ bet.odds }}</span>
+                </div>
+                <div class="horse-name">
+                    {% if bet.horse == 'home' %}
+                    {{ bet.home }}
+                    {% elif bet.horse == 'away' %}
+                    {{ bet.away }}
+                    {% else %}
+                    Draw
+                    {% endif %}
+                </div>
+                <div class="fixture">{{ bet.home }} vs {{ bet.away }}</div>
+                <div class="result">Result: {{ bet.actualhome }} - {{ bet.actualaway }}</div>
+                <div class="bet-details">
+                    <span class="stake-label">Stake:</span>
+                    <span class="stake-value">${{ bet.stake }}</span>
+                    {% if bet.winlose == 'win' %}
+                    <span class="winnings-label">Winnings:</span>
+                    <span class="winnings-value">${{ bet.payout }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Past Futures Bets -->
+            {% for bet in pastbets %}
+            <div class="bet-slip">
+                <div class="bet-header">
+                    <span class="type-label">Type:</span>
+                    <span class="type-value">Futures</span>
+                    <span class="odds">{{ '+' if bet.odds > 0 }}{{ bet.odds }}</span>
+                </div>
+                <div class="horse-name">{{ bet.horse }}</div>
+                <div class="bet-details">
+                    <span class="stake-label">Stake:</span>
+                    <span class="stake-value">${{ bet.stake }}</span>
+                    <span class="payout-label">Payout:</span>
+                    <span class="payout-value">${{ bet.payout }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+</body>
+</html>

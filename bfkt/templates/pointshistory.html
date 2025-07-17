@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Points History Graph</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pointshistory.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Points Progression Over the Season</h1>
+        <a href="{{ url_for('show_standings') }}" class="back-btn">← Back to Standings</a>
+    </header>
+
+    <main>
+        <div class="graph-container">
+            <img src="{{ url_for('static', filename='images/points_history_graph.png') }}" alt="Points History Graph" class="points-graph">
+        </div>
+    </main>
+
+    <section class="legend-wrapper">
+        <h2 class="legend-title">Legend</h2>
+        <div class="legend-container">
+            {% for p in participants %}
+            <div class="legend-entry">
+                <div class="legend-color-box" style="background-color: {{ p.color }};"></div>
+                <img src="{{ url_for('static', filename='images/' + p.filename) }}" class="legend-logo">
+                <span class="legend-name">{{ p.name }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</body>
+</html>

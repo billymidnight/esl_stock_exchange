@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Options Chain - {{ club_name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/options_chain.css') }}">
+    <style>
+        .close-slip {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 22px;
+            cursor: pointer;
+            color: #aaa;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 50%;
+            background-color: #21262d;
+            transition: background-color 0.2s ease;
+        }
+
+        .close-slip:hover {
+            background-color: #30363d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="{{ url_for('oneclub', clubname=club_name) }}" class="back-button">← Back to {{ club_name }}</a>
+        <h1>Options Chain - {{ club_name }}</h1>
+        <div class="header-right">
+            <div class="wallet-info">
+                <div class="big-number"><strong>Cash:</strong> ${{ bankroll }}</div>
+                <div class="big-number"><strong>Equity:</strong> ${{ equity }}</div>
+            </div>            
+            <img src="{{ url_for('static', filename='images/tradelogo.png') }}" alt="Trade Logo" class="club-logo">
+        </div>
+    </header>
+
+    <section class="club-info">
+        <div><strong>Club:</strong> {{ club_name }}</div>
+        <div><strong>Underlying Price:</strong> ${{ underlying_price }}</div>
+        <div><strong>Position:</strong> {{ position }}</div>
+        <div><strong>Current Gameweek:</strong> {{ gameweek }}</div>
+    </section>
+    
+    <section class="last-result {{ result_outcome }}">
+        <strong>Result This Gameweek ({{ gameweek }}):</strong> {{ latest_result }}
+    </section>    
+
+    <section class="expiry-buttons">
+        {% for expiry in option_chains.keys() %}
+            <button class="expiry-tab {% if loop.first %}active{% endif %}" onclick="showChain('{{ expiry }}')">
+                GW {{ expiry.split('_')[1] }}
+            </button>
+        {% endfor %}
+    </section>
+
+    {% for expiry, chain in option_chains.items() %}
+    <section class="chain-table chain-section" id="{{ expiry }}" style="{% if not loop.first %}display:none;{% endif %}">
+        <h2>Expiry: Gameweek {{ expiry.split('_')[1] }}</h2>
+        <div class="chain-scroll-container">
+            <div class="ladder-grid">
+                <div class="ladder-header">Call Bid</div>
+                <div class="ladder-header">Call Ask</div>
+                <div class="ladder-header">Bet Over</div>
+                <div class="ladder-header">Strike</div>
+                <div class="ladder-header">Bet Under</div>
+                <div class="ladder-header">Put Bid</div>
+                <div class="ladder-header">Put Ask</div>
+                <div class="ladder-header"> </div> 
+
+
+                {% for row in chain %}
+                    {% set highlight = row.strike == underlying_price %}
+
+                    <div class="call bid {% if highlight %}highlight{% endif %}"><button>${{ row.call_bid }}</button></div>
+                    <div class="call ask {% if highlight %}highlight{% endif %}"><button data-strike="{{ row.strike }}">${{ row.call_ask }}</button></div>
+
+                    <!-- Bet Over -->
+                    <div class="bet-over">
+                        <button class="bet-btn"
+                            onclick="openObetPopup('Over', {{ row.strike }}, {{ expiry.split('_')[1] }}, {{ row.call_odds }}, {{ row.call_decimal }})">
+                            Bet Over ({{ '+' if row.call_odds > 0 else '' }}{{ row.call_odds }})
+                        </button>
+                    </div>
+
+                    <!-- Strike -->
+                    <div class="strike {% if highlight %}highlight{% endif %}">
+                        {% if highlight %}<hr class="dotted-line">{% endif %}
+                        <span>${{ row.strike }}</span>
+                        {% if highlight %}<hr class="dotted-line">{% endif %}
+                    </div>
+
+                    <!-- Bet Under -->
+                    <div class="bet-under">
+                        <button class="bet-btn"
+                            onclick="openObetPopup('Under', {{ row.strike }}, {{ expiry.split('_')[1] }}, {{ row.put_odds }}, {{ row.put_decimal }})">
+                            Bet Under ({{ '+' if row.put_odds > 0 else '' }}{{ row.put_odds }})
+                        </button>
+                    </div>
+
+
+                    <div class="put bid {% if highlight %}highlight{% endif %}"><button>${{ row.put_bid }}</button></div>
+                    <div class="put ask {% if highlight %}highlight{% endif %}"><button data-strike="{{ row.strike }}">${{ row.put_ask }}</button></div>
+
+                    <div></div> 
+                {% endfor %}
+
+
+            </div>
+        </div>
+    </section>
+    {% endfor %}
+
+        <!-- ⚡ Popup for Over/Under Bet -->
+    <div id="obet-popup" class="obet-popup hidden">
+        <div class="obet-popup-inner">
+            <span class="obet-close" onclick="closeObetPopup()">×</span>
+            <h2>Place Digital Option Bet</h2>
+            <div class="obet-summary">
+                <p><strong>Club:</strong> <span id="obet-club"></span></p>
+                <p><strong>Type:</strong> <span id="obet-type"></span></p>
+                <p><strong>Strike:</strong> $<span id="obet-strike"></span></p>
+                <p><strong>Expiry GW:</strong> <span id="obet-expiry"></span></p>
+                <p><strong>Odds:</strong> <span id="obet-odds"></span></p>
+            </div>
+            <label for="obet-size">Bet Size ($):</label>
+            <input type="number" id="obet-size" placeholder="$0.00" min="1" step="any">
+            <p>
+                <strong style="color: #e2b714;">Potential Payout: $</strong>
+                <span id="obet-payout" style="color: #e2b714; font-weight: bold;">$0.00</span>
+            </p>
+            <button onclick="submitObet()">Place Bet</button>
+        </div>
+    </div>
+
+
+    <div id="options-slip" class="options-slip hidden">
+        <div class="close-slip" onclick="closeOptionsSlip()">×</div>
+        <div class="order-title">BUY</div>
+        <div class="order-meta">
+            <div><strong>Club:</strong> <span id="slip-club">{{ club_name }}</span></div>
+            <div id="slip-meta" class="meta-bold"></div>
+            <div><strong>Premium:</strong> $<span id="slip-premium"></span></div>
+        </div>
+        <label for="contract-count">Contracts:</label>
+        <input type="number" id="contract-count" placeholder="Enter contracts" min="1">
+        <div class="total-cost">Total: $<span id="slip-total">0.00</span></div>
+        <button onclick="submitOptionsBuy()">BUY</button>
+    </div>
+
+    <script>
+        function showChain(id) {
+            document.querySelectorAll('.chain-section').forEach(sec => sec.style.display = 'none');
+            document.getElementById(id).style.display = 'block';
+
+            document.querySelectorAll('.expiry-tab').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = [...document.querySelectorAll('.expiry-tab')].find(b => b.textContent.includes(id.split('_')[1]));
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+
+        function closeOptionsSlip() {
+            const slip = document.getElementById("options-slip");
+            slip.classList.add("hidden");
+        }
+
+
+        function openOptionsSlip(type, strike, expiry, askPrice) {
+            const slip = document.getElementById("options-slip");
+            slip.classList.remove("hidden");
+
+            const premium = (parseFloat(askPrice) === 0.0) ? 0.01 : parseFloat(askPrice);
+
+            document.getElementById("slip-meta").textContent = `$${strike} ${type.charAt(0).toUpperCase() + type.slice(1)} GW-${expiry}`;
+            document.getElementById("slip-premium").textContent = premium.toFixed(2);
+            document.getElementById("contract-count").value = "";
+            document.getElementById("slip-total").textContent = "0.00";
+
+            slip.dataset.type = type;
+            slip.dataset.strike = strike;
+            slip.dataset.expiry = expiry;
+            slip.dataset.premium = premium.toFixed(2);
+        }
+
+        document.querySelectorAll('.call.ask button, .put.ask button').forEach(button => {
+            button.addEventListener('click', function () {
+                const askPrice = this.innerText.replace('$', '');
+                const strike = this.dataset.strike;
+                const type = this.closest('div').classList.contains('call') ? 'call' : 'put';
+                const expiry = this.closest('.chain-section').id.split('_')[1];
+
+                openOptionsSlip(type, strike, expiry, askPrice);
+            });
+        });
+
+        document.getElementById("contract-count").addEventListener("input", function () {
+            const count = parseInt(this.value) || 0;
+            const premium = parseFloat(document.getElementById("options-slip").dataset.premium);
+            const total = (count * premium * 100).toFixed(2);
+            document.getElementById("slip-total").textContent = total;
+        });
+
+        function submitOptionsBuy() {
+            const count = parseInt(document.getElementById("contract-count").value);
+            if (!count || count <= 0) {
+                alert("Please enter a valid number of contracts.");
+                return;
+            }
+
+            const slip = document.getElementById("options-slip");
+
+            fetch("/handle_optionsbuy", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    club: "{{ club_name }}",
+                    type: slip.dataset.type,
+                    strike: parseFloat(slip.dataset.strike),
+                    expiry_gw: parseInt(slip.dataset.expiry),
+                    premium: parseFloat(slip.dataset.premium),
+                    contracts: count
+                })
+            })
+            .then(res => {
+                if (res.ok) {
+                    alert("Option Buy Submitted!");
+                    location.reload();
+                } else {
+                    alert("Error submitting order.");
+                }
+            });
+        }
+
+        function openObetPopup(type, strike, expiry, odds, decimalOdds) {
+            document.getElementById("obet-popup").classList.remove("hidden");
+            document.getElementById("obet-club").innerText = "{{ club_name }}";
+            document.getElementById("obet-type").innerText = type;
+            document.getElementById("obet-strike").innerText = strike;
+            document.getElementById("obet-expiry").innerText = expiry;
+            document.getElementById("obet-odds").innerText = (odds > 0 ? '+' : '') + odds;
+
+            const popup = document.getElementById("obet-popup");
+            popup.dataset.type = type;
+            popup.dataset.strike = strike;
+            popup.dataset.expiry = expiry;
+            popup.dataset.odds = decimalOdds.toFixed(2);
+            popup.dataset.amodds = odds;
+        }
+
+        function closeObetPopup() {
+                    document.getElementById("obet-popup").classList.add("hidden");
+                }
+
+                document.getElementById("obet-size").addEventListener("input", function () {
+                    const amount = parseFloat(this.value) || 0;
+                    const decimalOdds = parseFloat(document.getElementById("obet-popup").dataset.odds);
+                    const payout = amount * decimalOdds;
+                    document.getElementById("obet-payout").textContent = payout.toFixed(2);
+        });
+
+        function submitObet() {
+            const popup = document.getElementById("obet-popup");
+            const amount = parseFloat(document.getElementById("obet-size").value);
+
+            if (!amount || amount <= 0) {
+                alert("Enter a valid amount.");
+                return;
+            }
+
+            fetch("/obet_handler", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    club: "{{ club_name }}",
+                    type: popup.dataset.type,
+                    strike: parseFloat(popup.dataset.strike),
+                    expiry: parseInt(popup.dataset.expiry),
+                    odds: parseFloat(popup.dataset.amodds),
+                    decodds: parseFloat(popup.dataset.odds),
+                    size: amount
+                })
+            }).then(res => {
+                if (res.ok) {
+                    alert("Digital Bet Placed!");
+                    location.reload();
+                } else {
+                    alert("Failed to place bet.");
+                }
+            });
+        }
+
+        document.querySelectorAll(".bet-over button").forEach(btn => {
+            btn.addEventListener("click", function () {
+                const oddsText = this.innerText.match(/\\(([^)]+)\\)/)[1];
+                const odds = parseInt(oddsText);
+                const strike = this.closest(".ladder-grid").querySelector(".strike span").innerText.replace('$', '');
+                const expiry = this.closest(".chain-section").id.split('_')[1];
+                openObetPopup("Over", strike, expiry, odds);
+            });
+        });
+
+        document.querySelectorAll(".bet-under button").forEach(btn => {
+            btn.addEventListener("click", function () {
+                const oddsText = this.innerText.match(/\\(([^)]+)\\)/)[1];
+                const odds = parseInt(oddsText);
+                const strike = this.closest(".ladder-grid").querySelector(".strike span").innerText.replace('$', '');
+                const expiry = this.closest(".chain-section").id.split('_')[1];
+                openObetPopup("Under", strike, expiry, odds);
+            });
+        });
+
+    </script>
+</body>
+
+</html>

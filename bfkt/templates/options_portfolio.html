@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Options Portfolio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/options_portfolio.css') }}">
+</head>
+<body>
+    <header>
+        <a href="{{ url_for('traderopener') }}" class="back-button">← Back to Stock Exchange</a>
+        <h1>Options Portfolio</h1>
+    </header>
+
+    <section class="info-strip">
+        <div> Gameweek: {{ gameweek }}</div>
+        <div>💰 Bankroll: ${{ bankroll }}</div>
+        <div> Equity: ${{ equity }}</div>
+        <div> Options Equity: ${{ options_equity }}</div>
+        <div><strong style="color: dodgerblue;">Total Options P&L:</strong>
+            {% set net = net_pnl %}
+            <span class="{% if net >= 0 %}green{% else %}red{% endif %}">
+                ${{ net }} (Realized: ${{ total_realized_pnl }}, Unrealized: ${{ total_unrealized_pnl }})
+            </span>
+        </div>
+    </section>
+
+    <section>
+        <h2>Active Options</h2>
+        {% if active_options|length == 0 %}
+            <p class="gray">(No active options)</p>
+        {% else %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Option</th>
+                        <th>Contracts</th>
+                        <th>Cost</th>
+                        <th>Current</th>
+                        <th>Change</th>
+                        <th>Total Cost</th>
+                        <th>Market Value</th>
+                        <th>Unrealized P&L</th>
+                        <th>Underlying</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for opt in active_options %}
+                    <tr>
+                        <td>{{ opt.club }} ${{ opt.strike }} {{ opt.type|capitalize }} GW-{{ opt.expiry }}</td>
+                        <td>{{ opt.contracts }}</td>
+                        <td>${{ opt.cost }}</td>
+                        <td class="yellow">${{ opt.curr }}</td>
+                        <td class="{% if opt.change >= 0 %}green{% else %}red{% endif %}">
+                            {{ '+' if opt.change >= 0 }}${{ opt.change }} ({{ opt.pct_change }}%)
+                        </td>
+                        <td>${{ opt.total_cost }}</td>
+                        <td>${{ opt.market_value }}</td>
+                        <td class="{% if opt.unrealized_pnl >= 0 %}green{% else %}red{% endif %}">
+                            {{ '+' if opt.unrealized_pnl >= 0 }}${{ opt.unrealized_pnl }}
+                        </td>
+                        <td>
+                            ${{ opt.underlying_price }}
+                            {% if opt.underlying_change is not none %}
+                                <div class="{% if opt.underlying_change >= 0 %}green{% else %}red{% endif %}">
+                                    {{ '+' if opt.underlying_change >= 0 }}${{ opt.underlying_change }}
+                                    ({{ opt.underlying_pct_change }}%)
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td><button class="sell-btn" data-opt='{{ opt|tojson }}'>Sell</button></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </section>
+
+    <section>
+        <h2>Expired/Sold Options</h2>
+        {% if expired_options|length == 0 %}
+            <p class="gray">(No expired or sold options)</p>
+        {% else %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Option</th>
+                        <th>Contracts</th>
+                        <th>Cost</th>
+                        <th>Final Value</th>
+                        <th>Total Cost</th>
+                        <th>Proceeds</th>
+                        <th>Realized P&L</th>
+                        <th>Held Till Expiry</th>
+                        <th>Expired</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for opt in expired_options %}
+                    <tr>
+                        <td>{{ opt.club }} ${{ opt.strike }} {{ opt.type|capitalize }} GW-{{ opt.expiry }}</td>
+                        <td>{{ opt.contracts }}</td>
+                        <td>${{ opt.cost }}</td>
+                        <td>${{ opt.final_val }}</td>
+                        <td>${{ opt.total_cost }}</td>
+                        <td>${{ opt.proceeds }}</td>
+                        <td class="{% if opt.realized_pnl >= 0 %}green{% else %}red{% endif %}">
+                            {{ '+' if opt.realized_pnl >= 0 }}${{ opt.realized_pnl }} ({{ opt.realized_pct }}%)
+                        </td>
+                        <td>{{ 'Yes' if opt.held_to_expiry else 'No' }}</td>
+                        <td>{{ opt.expired_nature }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </section>
+
+    <!-- SELL SLIP OVERLAY -->
+<div id="sellSlip" class="sell-slip hidden">
+    <div class="slip-content">
+        <span class="close-btn" onclick="closeSlip()">×</span>
+        <h2>Sell Option</h2>
+        <p><strong>Option:</strong> <span id="slipOptionText"></span></p>
+        <p><strong>Gameweek:</strong> {{ gameweek }}</p>
+        <p><strong>Underlying Price:</strong> $<span id="slipUnderlying"></span></p>
+        <p><strong>Ask Price (1.2% below market):</strong> $<span id="slipAskPrice" class="yellow"></span></p>
+
+        <label for="contractsToSell">Contracts to Sell:</label>
+        <input type="number" id="contractsToSell" min="1" oninput="updateSellValue()" />
+        <p id="insufficientContracts" class="red hidden">Insufficient Contracts</p>
+
+        <p><strong>Market Value:</strong> $<span id="marketValueDisplay" class="green">0.00</span></p>
+
+        <button id="confirmSell" class="sell-btn" onclick="submitSell()">Confirm Sell</button>
+    </div>
+    </div>
+
+    <script>
+        let currentOption = {};
+
+        function openSellSlip(optionData) {
+            currentOption = optionData;
+            document.getElementById("slipOptionText").textContent = `${optionData.club} $${optionData.strike} ${optionData.type.toUpperCase()} GW-${optionData.expiry}`;
+            document.getElementById("slipUnderlying").textContent = optionData.underlying_price;
+            document.getElementById("slipAskPrice").textContent = (optionData.curr * 0.988).toFixed(2);
+            document.getElementById("contractsToSell").value = '';
+            document.getElementById("marketValueDisplay").textContent = "0.00";
+            document.getElementById("insufficientContracts").classList.add("hidden");
+
+            document.getElementById("sellSlip").classList.remove("hidden");
+        }
+
+        function closeSlip() {
+            document.getElementById("sellSlip").classList.add("hidden");
+        }
+
+        function updateSellValue() {
+            const num = parseInt(document.getElementById("contractsToSell").value);
+            const ask = currentOption.curr * 0.988;
+            if (isNaN(num) || num <= 0) {
+                document.getElementById("marketValueDisplay").textContent = "0.00";
+                document.getElementById("insufficientContracts").classList.add("hidden");
+                return;
+            }
+            const marketValue = (ask * 100 * num).toFixed(2);
+            document.getElementById("marketValueDisplay").textContent = marketValue;
+            if (num > currentOption.contracts) {
+                document.getElementById("insufficientContracts").classList.remove("hidden");
+            } else {
+                document.getElementById("insufficientContracts").classList.add("hidden");
+            }
+        }
+
+        function submitSell() {
+            const contracts = parseInt(document.getElementById("contractsToSell").value);
+            if (!contracts || contracts <= 0 || contracts > currentOption.contracts) {
+                return;
+            }
+            fetch("/sell_option", {
+                method: "POST",
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    holding_id: currentOption.id,
+                    contracts: contracts
+                })
+            }).then(res => {
+                if (res.ok) {
+                    window.location.reload();
+                } else {
+                    alert("Error processing sell order.");
+                }
+            });
+        }
+
+        // Attach click handlers
+        document.addEventListener("DOMContentLoaded", () => {
+            const sellButtons = document.querySelectorAll(".sell-btn[data-opt]");
+            sellButtons.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const option = JSON.parse(btn.dataset.opt.replace(/'/g, '"'));
+                    openSellSlip(option);
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

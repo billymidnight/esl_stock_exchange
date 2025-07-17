@@ -1,0 +1,197 @@
+/* Reset/Basic */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0d1117;
+  color: #c9d1d9;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+a {
+  text-decoration: none;
+}
+
+/* Header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #161b22;
+  padding: 16px 32px;
+  border-bottom: 2px solid #30363d;
+}
+.left-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.left-header .back-btn {
+  color: #58a6ff;
+  border: 1px solid #58a6ff;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+.left-header .back-btn:hover {
+  background-color: #58a6ff;
+  color: #0d1117;
+}
+.left-header h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #58a6ff;
+}
+.right-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.right-header .bankroll,
+.right-header .matchinfo {
+  font-size: 16px;
+  font-weight: 600;
+}
+.right-header .bankroll {
+  color: #00ff7f;
+}
+
+/* Main container */
+main {
+  width: 80%;
+  margin: 24px auto;
+}
+
+/* Fixture box */
+.fixture-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #161b22;
+  padding: 20px;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  margin-bottom: 32px;
+}
+.fixture-box .team {
+  text-align: center;
+  width: 120px;
+}
+.fixture-box .team img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid #58a6ff;
+}
+.fixture-box .team span {
+  display: block;
+  margin-top: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #c9d1d9;
+}
+.fixture-box .vs {
+  margin: 0 40px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #58a6ff;
+}
+
+/* Market sections */
+.market-section {
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+.market-section h2 {
+  margin-top: 0;
+  color: #58a6ff;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+/* Spread buttons evenly across the row */
+.market-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.market-row.small {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+/* Individual bet button */
+.bet-btn {
+  flex: 1;                        /* fill evenly */
+  min-width: 120px;              /* prevent ultra-small on mobile */
+  background-color: #2256ff;
+  color: #fff;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: background-color 0.2s, transform 0.1s;
+}
+.bet-btn:hover {
+  background-color: #3f57e0;
+  transform: scale(1.03);
+}
+.bet-btn .label {
+  font-size: 16px;
+  margin-bottom: 6px;
+  color: #f0f6fc;
+}
+.bet-btn .odds {
+  font-size: 18px;
+  font-weight: 700;
+  color: #00ff7f;
+}
+
+/* Two‐column section (Double Chance + BTTS) */
+.two-cols {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+.two-cols > div {
+  flex: 1;
+}
+
+/* Collapsible lists */
+.toggle-collapse {
+  background: none;
+  border: none;
+  color: #58a6ff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+}
+.collapsed-list {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+#all-totals:not(.collapsed-list),
+#all-spreads:not(.collapsed-list) {
+  max-height: 400px; /* expand “all hooks” */
+  margin-top: 12px;
+}
+
+/* Responsive fallback */
+@media (max-width: 768px) {
+  .market-row { flex-direction: column; }
+  .two-cols { flex-direction: column; }
+}

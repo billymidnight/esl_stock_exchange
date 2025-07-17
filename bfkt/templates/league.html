@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super League Simulator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/league.css') }}">
+    <script>
+        function openMoneylineBetForm(type, odds, matchId) {
+            document.getElementById('betType').innerText = type;
+            document.getElementById('oddsValue').innerText = odds > 0 ? '+' + odds : odds;
+            document.getElementById('typeInput').value = "moneyline";
+            document.getElementById('oddsInput').value = odds;
+            document.getElementById('matchIdInput').value = matchId;
+
+            let horse = "";
+            if (type === "Home") {
+                horse = "home";
+            } else if (type === "Draw") {
+                horse = "draw";
+            } else if (type === "Away") {
+                horse = "away";
+            }
+            document.getElementById('horseInput').value = horse;
+
+            document.getElementById('moneylineBetPopup').style.display = 'block';
+        }
+
+        function closeMoneylineBetForm() {
+            document.getElementById('moneylineBetPopup').style.display = 'none';
+        }
+
+        function showBetPlacedMessage() {
+            alert("Bet Placed Successfully");
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Pritesh's Super League</h1>
+        <div class="header-info">
+            <div>
+                <span class="bankroll-display">Bankroll: ${{ bankroll }}</span>
+                <span class="bankroll-display">Game #{{ gamenohere }}</span>
+                <a href="{{ url_for('statistics') }}" class="schedule-button">Statistics</a>
+                <a href="{{ url_for('sportsbook_handler') }}" class="schedule-button">Betting</a>
+                <a href="{{ url_for('view_schedule') }}" class="view-schedule-button">View Schedule</a>
+                <a href="{{ url_for('betzoom') }}" class="view-schedule-button">More Bets</a>
+                {% if gamenohere == 0 %}
+                    <a href="{{ url_for('schedule') }}" class="schedule-button">Match Scheduler for Gameweek {{ matchday }}</a>
+                {% else %}
+                    <span class="schedule-button" style="cursor: default; opacity: 0.6;">Gameweek {{ matchday }} in Progress</span>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <main>
+
+        <div class="trade-button-container">
+            <a href="{{ url_for('traderopener') }}" class="trade-button">Trade Clubs (Underlying or Derivatives)</a>
+        </div>
+        <!-- Upcoming Fixture Section -->
+        <section class="fixture-section">
+            <h2>Upcoming Fixture</h2>
+            <div class="fixture-details">
+                <div class="team">
+                    <img src="{{ url_for('static', filename='images/' + fixture.homepic) }}" alt="{{ fixture.homename }} Logo" class="team-logo">
+                    <span>{{ fixture.homename }}</span>
+                </div>
+                <span class="vs">vs</span>
+                <div class="team">
+                    <img src="{{ url_for('static', filename='images/' + fixture.awaypic) }}" alt="{{ fixture.awayname }} Logo" class="team-logo">
+                    <span>{{ fixture.awayname }}</span>
+                </div>
+            </div>
+
+            {% if not noodds %}
+            <div class="bet-buttons">
+                <button onclick="openMoneylineBetForm('Home', '{{ homeodds }}', '{{ gameno }}')">
+                    Home (
+                    {% if homeodds > 0 %}+{% endif %}
+                    {{ homeodds }})
+                </button>
+                <button onclick="openMoneylineBetForm('Draw', '{{ drawodds }}', '{{ gameno }}')">
+                    Draw (
+                    {% if drawodds > 0 %}+{% endif %}
+                    {{ drawodds }})
+                </button>
+                <button onclick="openMoneylineBetForm('Away', '{{ awayodds }}', '{{ gameno }}')">
+                    Away (
+                    {% if awayodds > 0 %}+{% endif %}
+                    {{ awayodds }})
+                </button>
+            </div>
+            {% endif %}
+
+            <form action="{{ url_for('results_generator') }}" method="POST" class="simulate-form">
+                <button type="submit">Simulate Match</button>
+                <input type="hidden" name="idoffset" value="{{ gameno }}">
+                <input type="hidden" name="operation" value="simulate">
+            </form>
+            <form action="{{ url_for('gameweek_sim') }}" method="POST" class="simulate-form small-sim" style="margin-top: 15px;">
+                <button type="submit">Simulate Rest of Gameweek {{ matchday }}</button>
+                <input type="hidden" name="idoffset" value="{{ gameno }}">
+            </form>
+
+            
+        </section>
+
+        {% if not noodds %}
+        <div id="moneylineBetPopup" style="display: none;">
+            <div class="popup-content">
+                <h2>Place Your Bet</h2>
+                <p>Type: <span id="betType"></span></p>
+                <p>Odds: <span id="oddsValue"></span></p>
+                <form action="{{ url_for('bet_handler') }}" method="POST">
+                    <input type="hidden" name="type" id="typeInput" value="moneyline">
+                    <input type="hidden" name="odds" id="oddsInput">
+                    <input type="hidden" name="matchid" id="matchIdInput">
+                    <input type="hidden" name="home" value="{{ fixture.homename }}">
+                    <input type="hidden" name="away" value="{{ fixture.awayname }}">
+                    <input type="hidden" name="idmatch" value="{{ matchid }}">
+                    <input type="hidden" name="horse" id="horseInput">
+                    <label for="stake">Enter Stake ($):</label>
+                    <input type="number" id="stake" name="stake" min="1" required>
+                    <div class="form-actions">
+                        <button type="submit">Place Bet</button>
+                        <button type="button" onclick="closeMoneylineBetForm()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Position</th>
+                    <th>Photo</th>
+                    <th>Team Name</th>
+                    <th>Played</th>
+                    <th>Wins</th>
+                    <th>Draws</th>
+                    <th>Losses</th>
+                    <th>Goals For</th>
+                    <th>Goals Against</th>
+                    <th>Goal Difference</th>
+                    <th>Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for standing in standings %}
+                <tr>
+                    <td>{{ standing.position }}</td>
+                    <td><img src="{{ url_for('static', filename='images/' + standing.img_name) }}" alt="Team Logo" width="150"></td>
+                    <td>{{ standing.name }}</td>
+                    <td>{{ standing.matches_played }}</td>
+                    <td>{{ standing.wins }}</td>
+                    <td>{{ standing.draws }}</td>
+                    <td>{{ standing.losses }}</td>
+                    <td>{{ standing.goals_for }}</td>
+                    <td>{{ standing.goals_against }}</td>
+                    <td>{{ standing.goal_difference }}</td>
+                    <td>{{ standing.points }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <section class="form-section">
+            <h2>Update Match Results</h2>
+            <form action="{{ url_for('update_standings', target='/') }}" method="POST">
+                <div class="form-group">
+                    <label for="home">Home Team</label>
+                    <input type="text" id="home" name="home" required>
+                </div>
+                <div class="form-group">
+                    <label for="away">Away Team</label>
+                    <input type="text" id="away" name="away" required>
+                </div>
+                <div class="form-group">
+                    <label for="homegoals">Home Goals</label>
+                    <input type="number" id="homegoals" name="homegoals" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="awaygoals">Away Goals</label>
+                    <input type="number" id="awaygoals" name="awaygoals" min="0" required>
+                </div>
+                <button type="submit">Submit</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

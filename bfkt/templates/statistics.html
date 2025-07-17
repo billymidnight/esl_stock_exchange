@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>League Statistics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/statistics.css') }}">
+</head>
+<body>
+    <div class="stats-header">
+        <h1>League Statistics</h1>
+        <a href="{{ url_for('traderopener') }}" class="back-btn">← Back to Stock Exchange</a>
+        <a href="{{ url_for('graph_generator') }}" class="h2h-btn">Points History</a>
+        <a href="{{ url_for('h2h_open') }}" class="h2h-btn">H2H Comparator</a>
+    </div>
+
+    <div class="stats-section">
+        <h2>Results Summary</h2>
+        <div class="stats-grid">
+            <div class="stats-box">
+                <h3>Most Wins ({{ most_wins[0] }})</h3>
+                {% for club in most_wins[1] %}
+                    <div class="club-row">
+                        <img src="{{ url_for('static', filename='images/' + club.filename) }}">
+                        <span>{{ club.club }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="stats-box">
+                <h3>Most Draws ({{ most_draws[0] }})</h3>
+                {% for club in most_draws[1] %}
+                    <div class="club-row">
+                        <img src="{{ url_for('static', filename='images/' + club.filename) }}">
+                        <span>{{ club.club }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="stats-box">
+                <h3>Most Losses ({{ most_losses[0] }})</h3>
+                {% for club in most_losses[1] %}
+                    <div class="club-row">
+                        <img src="{{ url_for('static', filename='images/' + club.filename) }}">
+                        <span>{{ club.club }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-section">
+        <h2>Clean Sheets</h2>
+        <div class="stats-grid">
+            <div class="stats-box">
+                <h3>Most Clean Sheets ({{ most_clean_sheets.count }})</h3>
+                {% for club in most_clean_sheets.clubs %}
+                    <div class="club-row">
+                        <img src="{{ url_for('static', filename='images/' + club.filename) }}">
+                        <span>{{ club.club }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="stats-box">
+                <h3>Least Clean Sheets ({{ least_clean_sheets.count }})</h3>
+                {% for club in least_clean_sheets.clubs %}
+                    <div class="club-row">
+                        <img src="{{ url_for('static', filename='images/' + club.filename) }}">
+                        <span>{{ club.club }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-section">
+        <h2>Streaks</h2>
+        {% for group in [
+            ("Longest Winning Streaks", longest_win_streaks),
+            ("Longest Losing Streaks", longest_loss_streaks),
+            ("Longest Unbeaten Streaks", longest_unbeaten_streaks),
+            ("Longest Winless Streaks", longest_winless_streaks),
+            ("Longest Drawing Streaks", longest_draw_streaks)
+        ] %}
+            {% set title = group[0] %}
+            {% set streak_data = group[1] %}
+            {% if streak_data %}
+                <div class="streak-box">
+                    <h3>{{ title }}</h3>
+                    {% for entry in streak_data %}
+                        <h4>{{ entry.length }} games</h4>
+                        <div class="club-streak-group">
+                            {% for club in entry.clubs %}
+                                <div class="club-row">
+                                    <img src="{{ url_for('static', filename='images/' + club.filename) }}">
+                                    <span>{{ club.club }} (GW{{ club.from_gw }} → GW{{ club.to_gw }})</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <div class="stats-section">
+        <h2>Biggest Recorded Win ({{ biggest_win_margin }} goal margin)</h2>
+        <div class="stats-box">
+            {% for match in biggest_wins %}
+                <p><strong>GW{{ match.gameweek }}:</strong> {{ match.home }} {{ match.score }} {{ match.away }}</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="stats-section">
+        <h2>Top Head-to-Head Meetings</h2>
+        <div class="stats-box">
+            {% for row in top_head_to_heads %}
+                <p>
+                    <img src="{{ url_for('static', filename='images/' + row.filenames[0]) }}" class="tiny-logo">
+                    <strong>{{ row.clubs[0] }}</strong> vs 
+                    <strong>{{ row.clubs[1] }}</strong>
+                    <img src="{{ url_for('static', filename='images/' + row.filenames[1]) }}" class="tiny-logo">
+                    — {{ row.count }} matches
+                </p>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

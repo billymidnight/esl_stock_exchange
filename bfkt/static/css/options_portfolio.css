@@ -1,0 +1,183 @@
+body {
+    background-color: #0d1117;
+    color: #f0f0f0;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.back-button {
+    color: #61dafb;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+h1, h2 {
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+.info-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-bottom: 30px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 40px;
+    background-color: #161b22;
+}
+
+th, td {
+    border: 1px solid #2c313a;
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+}
+
+th {
+    background-color: #21262d;
+    color: #f0f0f0;
+}
+
+.green {
+    color: #00e676;
+    font-weight: bold;
+}
+
+.red {
+    color: #ff5252;
+    font-weight: bold;
+}
+
+.yellow {
+    color: #ffd54f;
+    font-weight: bold;
+}
+
+.gray {
+    color: #999;
+    font-style: italic;
+}
+
+.sell-btn {
+    padding: 6px 12px;
+    font-size: 14px;
+    background-color: #e53935;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.sell-btn:hover {
+    background-color: #c62828;
+}
+
+.sell-slip {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.sell-slip .slip-content {
+    background-color: #161b22;
+    padding: 30px;
+    border-radius: 10px;
+    width: 500px;
+    color: white;
+    font-size: 16px;
+    box-shadow: 0 0 12px #222;
+    position: relative;
+}
+
+.sell-slip input {
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    padding: 8px;
+    font-size: 15px;
+    border: 1px solid #333;
+    background-color: #0d1117;
+    color: white;
+}
+
+.sell-slip .close-btn {
+    position: absolute;
+    top: 8px;
+    right: 14px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #bbb;
+}
+
+.sell-slip .close-btn:hover {
+    color: #f44336;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Digital‐Options P&L Summary Bar */
+.digital-summary {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem 1.5rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid #444;
+  font-size: 1rem;
+}
+.digital-summary .summary-label {
+  color: #aaa;
+  font-weight: 500;
+}
+.digital-summary .summary-value {
+  font-weight: 700;
+}
+.digital-summary .profit { color: #00c853; }
+.digital-summary .losses { color: #ff5252; }
+.digital-summary .net { color: #008080; }
+
+/* —— Active Digital Options Summary —— */
+.digital-active-summary {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid #444;
+}
+.digital-active-summary .das-label {
+  color: #aaa;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+.digital-active-summary .das-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+.digital-active-summary .upside {
+  color: #00c853;  /* green */
+}
+.digital-active-summary .downside {
+  color: #ff5252; /* red */
+}

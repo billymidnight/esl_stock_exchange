@@ -1,0 +1,248 @@
+body {
+    background-color: #0a0a0a;
+    color: #00ff88;
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #181818; /* Slightly lighter than pure black */
+    color: #00ff88;
+    padding: 20px;
+    border-bottom: 2px solid #00ff88;
+}
+
+
+h1 {
+    font-size: 2em;
+    margin: 0;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.trade-logo {
+    width: 100px;
+    height: 100px;
+}
+
+.back-button {
+    color: #00ff88;
+    text-decoration: none;
+    font-size: 18px;
+    padding: 8px 16px;
+    border: 1px solid #00ff88;
+    border-radius: 4px;
+    transition: all 0.3s ease-in-out;
+}
+
+.back-button:hover {
+    background-color: #00ff88;
+    color: #000;
+}
+
+.equity-display {
+    font-size: 20px;
+    padding: 10px 40px;
+    border-bottom: 1px solid #00ff88;
+}
+
+.portfolio-section {
+    padding: 30px 40px;
+}
+
+.portfolio-section h2 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    color: #00ffaa;
+}
+
+.club-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    padding: 40px;
+}
+
+.club-box {
+    background-color: #111;
+    border: 1px solid #00ff88;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    color: #00ff88;
+    text-decoration: none;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 0 10px #00ff88;
+}
+
+.club-box:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #00ff88;
+    background-color: #151515;
+}
+
+.club-logo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 15px;
+    border: 2px solid #00ff88;
+}
+
+.club-name {
+    font-size: 1.3em;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.club-price {
+    font-size: 1.1em;
+    margin-bottom: 5px;
+    color: #00ffaa;
+}
+
+.club-position {
+    font-size: 0.9em;
+    color: #44ff99;
+}
+
+.portfolio-list {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.portfolio-item {
+    padding: 14px 18px;
+    background-color: #121212;
+    border: 1px solid #333;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+    color: #e0e0e0;
+}
+
+.portfolio-club {
+    font-weight: bold;
+    font-size: 1.45em;
+    color: #f5f5f5;
+    flex-shrink: 0;
+    width: 150px;
+}
+
+.portfolio-metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.metric {
+    font-size: 16px;
+    color: #cccccc;
+}
+
+.metric.yellow {
+    color: #b19f01;
+}
+
+.metric.change.green {
+    color: #81c784; /* Mellow green */
+    font-weight: 600;
+}
+
+.metric.change.red {
+    color: #e57373; /* Mellow red */
+    font-weight: 600;
+}
+
+.metric.gray {
+    color: #999999;
+}
+
+
+.toggle-btn {
+    margin-top: 12px;
+    padding: 10px 16px;
+    background-color: #1f1f1f;
+    border: 1px solid #00ffaa;
+    color: #00ffaa;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background-color 0.3s ease;
+}
+
+.toggle-btn:hover {
+    background-color: #2a2a2a;
+}
+
+.portfolio-link {
+    font-size: 14px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border: 1px solid #00ffaa;
+    border-radius: 5px;
+    background-color: #111;
+    color: #00ffaa;
+    text-decoration: none;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.portfolio-link:hover {
+    background-color: #00ffaa;
+    color: #000;
+}
+
+.ticker-container {
+    overflow: hidden;
+    white-space: nowrap;
+    background-color: #0d1117;
+    border-top: 1px solid #30363d;
+    border-bottom: 1px solid #30363d;
+    padding: 12px 0;
+    margin-bottom: 20px;
+}
+
+.ticker-track {
+    display: inline-block;
+    white-space: nowrap;
+    min-width: 200%;
+    animation: tickerMove 70s linear infinite;  /* ← now this will actually work */
+}
+
+.ticker-item {
+    display: inline-block;
+    margin-right: 50px;
+    font-size: 17px;
+    color: #e0e0e0;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+@keyframes tickerMove {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
+}
+
+.green { color: #81c784; }
+.red { color: #e57373; }
+.gray { color: #999; }
+
+.green {
+    color: #81c784;
+}
+.red {
+    color: #e57373;
+}
+.gray {
+    color: #999;
+}

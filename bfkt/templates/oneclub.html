@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stock - {{ club_name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/oneclub.css') }}">
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <a href="{{ url_for('traderopener') }}" class="back-btn">← Stock Exchange</a>
+            <a href="{{ url_for('show_standings') }}" class="back-btn">🏠 Home</a>
+        </div>
+        <div class="title">Stock - {{ club_name }}</div>
+        <img src="{{ url_for('static', filename='images/tradelogo.png') }}" alt="Logo" class="logo">
+    </div>
+
+    <div class="action-row">
+        <div class="bankroll-display">
+            💰 Cash Equity: ${{ bankroll | round(2) }}
+        </div>
+        <div class="action-buttons">
+            <button class="buy-button">Buy</button>
+            <button class="sell-button">Sell</button>
+            <a href="{{ url_for('options_machine') }}?club={{ club_name }}" class="options-button">Options</a>
+        </div>
+    </div>
+    
+
+    <div class="main-container">
+        <div class="club-card">
+            <div class="club-header">
+                <h2>{{ club_name }}</h2>
+                <div class="header-right">
+                    <span class="record-display">
+                        <span class="green">{{ wins }}</span>/<span class="yellow">{{ draws }}</span>/<span class="red">{{ losses }}</span>
+                    </span>
+                    <span class="weekly-change {% if weekly_change >= 0 %}green{% else %}red{% endif %}">
+                        {% if weekly_change >= 0 %}⬆{% else %}⬇{% endif %}
+                        {{ dollar_change }}
+                        ({{ weekly_change | round(2) }}%)
+                    </span>
+                </div>
+            </div>
+            
+
+            <div class="club-body">
+                <div class="club-info-left">
+                    <img src="{{ url_for('static', filename='images/' + filename) }}" alt="Club Logo" class="club-logo">
+                    <div class="price">${{ stock_price | round(2) }}</div>
+                    <p>Position: {{ position }}</p>
+                    <p>Goals Scored: {{ goals_for }}</p>
+                    <p>Goals Conceded: {{ goals_against }}</p>
+                    <p>Goal Difference: {{ goal_diff }}</p>
+                </div>
+
+                <div class="club-info-right">
+                    <div class="last-results-box">
+                        <h3>Last 5 Results</h3>
+                        <ul>
+                            {% for match in last_results %}
+                            <li class="{% if match.result == 'W' %}green{% elif match.result == 'L' %}red{% else %}yellow{% endif %}">
+                                {{ match.home }} {{ match.home_goals }} - {{ match.away_goals }} {{ match.away }} ({{ match.result }})
+                            </li>
+                            {% endfor %}
+                            {% if last_results|length == 0 %}
+                                <li>No previous matches</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if holding.volume >= 1 %}
+        <div class="holding-box">
+            <h3>Your Position</h3>
+            <div class="holding-grid">
+                <div><strong>Volume:</strong> {{ holding.volume }}</div>
+                <div><strong>Avg Cost:</strong> ${{ holding.avg_cost }}</div>
+                <div><strong>Total Cost:</strong> ${{ holding.total_cost }}</div>
+                <div><strong>Market Value:</strong> ${{ holding.value }}</div>
+                <div>
+                    <strong>Total Return:</strong>
+                    {% if holding.return >= 0 %}
+                        <span class="green">+${{ holding.return }} ⬆</span>
+                    {% else %}
+                        <span class="red">${{ holding.return }} ⬇</span>
+                    {% endif %}
+                </div>
+                <div>
+                    <strong>Total Return %:</strong>
+                    {% if holding.return_pct >= 0 %}
+                        <span class="green">+{{ holding.return_pct | round(2) }}%</span>
+                    {% else %}
+                        <span class="red">{{ holding.return_pct | round(2) }}%</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if graph_filename %}
+        <div class="graph-container">
+            <h3>Chart</h3>
+            <img src="{{ url_for('static', filename='images/graphs/' + graph_filename) }}" alt="Rating Graph" class="graph-img">
+        </div>
+        {% endif %}
+
+        {% if financials %}
+        <div class="financials-box">
+            <h3>Key Financials</h3>
+            <div class="financials-grid">
+                <div><strong> All-Time High:</strong> <span class="green">${{ financials.alltime_high }}</span></div>
+                <div><strong> All-Time Low:</strong> <span class="red">${{ financials.alltime_low }}</span></div>
+
+                {% if financials.largest_win %}
+                <div><strong> Biggest Win:</strong> {{ financials.largest_win.gf }}-{{ financials.largest_win.ga }} vs {{ financials.largest_win.opponent }} (GW{{ financials.largest_win.gameweek }})</div>
+                {% endif %}
+
+                {% if financials.largest_loss %}
+                <div><strong> Biggest Loss:</strong> {{ financials.largest_loss.gf }}-{{ financials.largest_loss.ga }} vs {{ financials.largest_loss.opponent }} (GW{{ financials.largest_loss.gameweek }})</div>
+                {% endif %}
+
+                {% if financials.longest_win_streak %}
+                <div><strong> Longest Win Streak:</strong> {{ financials.longest_win_streak.length }} games (From GW{{ financials.longest_win_streak.gw_start }} to GW{{ financials.longest_win_streak.gw_end }})</div>
+                {% endif %}
+
+                {% if financials.longest_loss_streak %}
+                <div><strong> Longest Loss Streak:</strong> {{ financials.longest_loss_streak.length }} games (From GW{{ financials.longest_loss_streak.gw_start }} to GW{{ financials.longest_loss_streak.gw_end }})</div>
+
+                {% endif %}
+
+                <div><strong> Most Wins vs:</strong>
+                    {% for team in financials.most_wins_against %}
+                        {{ team.club }} ({{ team.count }}){% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </div>
+                
+                <div><strong> Most Losses vs:</strong>
+                    {% for team in financials.most_losses_against %}
+                        {{ team.club }} ({{ team.count }}){% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </div>
+                
+                <div><strong> Biggest Weekly Jump:</strong> <span class="green">+{{ financials.biggest_jump.jump }}%</span> (GW{{ financials.biggest_jump.gameweek }})</div>
+                <div><strong> Biggest Weekly Drop:</strong> <span class="red">{{ financials.biggest_fall.fall }}%</span> (GW{{ financials.biggest_fall.gameweek }})</div>
+                
+            </div>
+        </div>
+        {% endif %}
+
+
+        <div class="description-box">
+            <h3>About</h3>
+            <p>{{ description }}</p>
+        </div>
+
+        <div id="buy-slip" class="order-slip hidden">
+            <div class="close-slip" onclick="closeBuySlip()">×</div>
+            <div class="order-title">Market Order for "{{ club_name }}"</div>
+            <div class="order-type green">BUY</div>
+            <div class="order-price">Price: ${{ stock_price | round(2) }}</div>
+            <label for="buy-volume">Volume:</label>
+            <input type="number" id="buy-volume" placeholder="Enter shares" min="1">
+            <div class="total-cost">Total: $<span id="total-cost">0.00</span></div>
+            <button onclick="submitBuyOrder()">BUY</button>
+        </div>
+        {% if holding.volume >= 1 %}
+        <div id="sell-slip" class="order-slip hidden">
+            <div class="close-slip" onclick="closeSellSlip()">×</div>
+            <div class="order-title">Market Order for "{{ club_name }}"</div>
+            <div class="order-type red">SELL</div>
+            <div class="order-price">Price: ${{ stock_price | round(2) }}</div>
+
+            <label for="sell-volume">Volume:</label>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="number" id="sell-volume" placeholder="Enter shares" min="1">
+                <button onclick="sellEverything()" style="padding: 6px 10px; font-size: 14px; font-weight: bold; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">Everything</button>
+            </div>
+
+            <div class="total-cost">Total: $<span id="sell-total">0.00</span></div>
+            <button style="background-color: #dc3545;" onclick="submitSellOrder()">SELL</button>
+        </div>
+        {% endif %}
+
+
+        <script>
+            const buyBtn = document.querySelector(".buy-button");
+            const buySlip = document.getElementById("buy-slip");
+            const buyVolumeInput = document.getElementById("buy-volume");
+            const totalCostDisplay = document.getElementById("total-cost");
+            const stockPrice = {{ stock_price | round(2) }};
+
+            buyBtn.addEventListener("click", () => {
+                buySlip.classList.remove("hidden");
+            });
+
+            buyVolumeInput.addEventListener("input", () => {
+                const volume = parseInt(buyVolumeInput.value) || 0;
+                const total = (volume * stockPrice).toFixed(2);
+                totalCostDisplay.innerText = total;
+            });
+
+            function submitBuyOrder() {
+                const volume = parseInt(buyVolumeInput.value);
+                if (!volume || volume <= 0) {
+                    alert("Please enter a valid number of shares.");
+                    return;
+                }
+
+                fetch("/handle_buyorder", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        club_name: "{{ club_name }}",
+                        trade_type: "buy",
+                        volume: volume,
+                        price: stockPrice
+                    })
+                })
+                .then(res => {
+                    if (res.ok) {
+                        alert("Buy order submitted!");
+                        location.reload();
+                    } else {
+                        alert("Error placing order.");
+                    }
+                });
+            }
+
+            function closeBuySlip() {
+                buySlip.classList.add("hidden");
+            }
+
+            const sellBtn = document.querySelector(".sell-button");
+            const sellSlip = document.getElementById("sell-slip");
+            const sellVolumeInput = document.getElementById("sell-volume");
+            const sellTotalDisplay = document.getElementById("sell-total");
+
+            sellBtn.addEventListener("click", () => {
+                {% if holding.volume >= 1 %}
+                sellSlip.classList.remove("hidden");
+                {% else %}
+                alert("You don't own any shares to sell.");
+                {% endif %}
+            });
+
+            sellVolumeInput.addEventListener("input", () => {
+                const volume = parseInt(sellVolumeInput.value) || 0;
+                const total = (volume * stockPrice).toFixed(2);
+                sellTotalDisplay.innerText = total;
+            });
+
+            function sellEverything() {
+                sellVolumeInput.value = {{ holding.volume }};
+                const total = ({{ holding.volume }} * stockPrice).toFixed(2);
+                sellTotalDisplay.innerText = total;
+            }
+
+            function submitSellOrder() {
+                const volume = parseInt(sellVolumeInput.value);
+                if (!volume || volume <= 0) {
+                    alert("Please enter a valid number of shares.");
+                    return;
+                }
+
+                fetch("/handle_sellorder", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        club_name: "{{ club_name }}",
+                        trade_type: "sell",
+                        volume: volume,
+                        price: stockPrice
+                    })
+                })
+                .then(res => {
+                    if (res.ok) {
+                        alert("Sell order submitted!");
+                        location.reload();
+                    } else {
+                        alert("Error placing sell order.");
+                    }
+                });
+            }
+
+            function closeSellSlip() {
+                sellSlip.classList.add("hidden");
+            }
+
+
+        </script>
+
+    </div>
+</body>
+</html>

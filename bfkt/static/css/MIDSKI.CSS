@@ -1,0 +1,295 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    margin: 0;
+}
+
+.bankroll-display {
+    font-size: 18px;
+    font-weight: bold;
+    color: #FFD700; 
+    margin-right: 15px;
+    display: inline-block; 
+}
+
+
+
+.schedule-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.schedule-button:hover {
+    background-color: #45a049;
+}
+
+.view-schedule-button {
+    background-color: #2196F3;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+.view-schedule-button:hover {
+    background-color: #1E88E5;
+}
+
+.trade-button-container {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.trade-button {
+    background-color: #2256ff;
+    color: white;
+    padding: 14px 28px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.trade-button:hover {
+    background-color: #612ba0;
+    transform: scale(1.05);
+}
+
+
+main {
+    width: 80%;
+    margin: 0 auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+    height: 80px;
+}
+
+img {
+    border-radius: 5px;
+    width: 100px;
+    height: auto;
+}
+
+th {
+    background-color: #444;
+    color: #fff;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Upcoming Fixture Section */
+.fixture-section {
+    background-color: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.fixture-section h2 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.fixture-details {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 15px 0;
+}
+
+.team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 20px;
+}
+
+.team-logo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+}
+
+.vs {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.simulate-form {
+    margin-top: 10px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.form-section {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-section h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input[type="text"], input[type="number"] {
+    width: calc(100% - 22px);
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+}
+
+/* Moneyline Bet Buttons Styling */
+.bet-buttons {
+    display: flex;
+    justify-content: center;
+    margin: 15px 0;
+}
+
+.bet-buttons button {
+    background-color: #2196F3;
+    color: white;
+    padding: 10px 20px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s;
+}
+
+.bet-buttons button:hover {
+    background-color: #1E88E5;
+}
+
+/* Popup Styling for Moneyline Bets */
+#moneylineBetPopup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+    padding: 20px;
+    z-index: 1000;
+    border-radius: 8px;
+    width: 300px;
+}
+
+.popup-content {
+    text-align: center;
+}
+
+.popup-content h2 {
+    margin-top: 0;
+}
+
+.popup-content p {
+    margin: 10px 0;
+}
+
+.popup-content form {
+    display: flex;
+    flex-direction: column;
+}
+
+.popup-content label {
+    margin-bottom: 5px;
+}
+
+.popup-content input[type="number"] {
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+}
+
+.form-actions button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.form-actions button[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.form-actions button[type="button"] {
+    background-color: #f44336;
+    color: white;
+}

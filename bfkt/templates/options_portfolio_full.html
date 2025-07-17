@@ -1,0 +1,425 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Options Portfolio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/options_portfolio.css') }}">
+    <script>
+        function toggleView(view) {
+            document.getElementById('vanilla-options-view').style.display = view === 'vanilla' ? 'block' : 'none';
+            document.getElementById('obet-view').style.display = view === 'obet' ? 'block' : 'none';
+            document.getElementById('toggle-vanilla').classList.toggle('active', view === 'vanilla');
+            document.getElementById('toggle-obet').classList.toggle('active', view === 'obet');
+        }
+
+        function toggleObetSubview(view) {
+            document.getElementById('active-obets').style.display = view === 'active' ? 'flex' : 'none';
+            document.getElementById('finished-obets').style.display = view === 'finished' ? 'flex' : 'none';
+            document.getElementById('sub-toggle-active').classList.toggle('active', view === 'active');
+            document.getElementById('sub-toggle-finished').classList.toggle('active', view === 'finished');
+        }
+
+        window.onload = function() {
+            toggleView('vanilla');
+            toggleObetSubview('active');
+        };
+    </script>
+    <style>
+        .toggle-bar, .sub-toggle-bar {
+            display: flex;
+            margin: 20px;
+            gap: 10px;
+        }
+
+        .toggle-bar button, .sub-toggle-bar button {
+            padding: 8px 20px;
+            border: none;
+            cursor: pointer;
+            background-color: #eee;
+            font-weight: bold;
+            border-radius: 5px;
+            transition: background-color 0.2s ease;
+        }
+
+        .toggle-bar button.active, .sub-toggle-bar button.active {
+            background-color: dodgerblue;
+            color: white;
+        }
+
+        .obet-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: flex-start;
+            margin-top: 20px;
+        }
+
+        .obet-card {
+            background-color: #1f1f1f;
+            color: #f5f5f5;
+            border: 2px solid #3a3a3a;
+            border-radius: 12px;
+            padding: 20px;
+            width: 360px;
+            height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease;
+        }
+
+        .obet-card:hover {
+            transform: scale(1.02);
+        }
+
+        .obet-top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            font-weight: 600;
+            color: #00c9db;
+        }
+
+        .obet-expiry {
+            font-size: 14px;
+            color: #cccccc;
+            text-align: left;
+            margin-top: 4px;
+        }
+
+        .obet-club {
+            font-size: 28px;
+            text-align: center;
+            font-weight: bold;
+            color: white;
+            margin: 14px 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .obet-bottom {
+            display: flex;
+            justify-content: space-between;
+            font-size: 16px;
+            color: #cfcfcf;
+        }
+
+        .obet-bottom .obet-stake,
+        .obet-bottom .obet-payout {
+            font-weight: 500;
+        }
+
+        .obet-card.win {
+            border-color: #00c853;
+            box-shadow: 0 4px 12px rgba(0, 200, 83, 0.3);
+        }
+        .obet-card.loss {
+            border-color: #ff5252;
+            box-shadow: 0 4px 12px rgba(255, 82, 82, 0.3);
+        }
+        .obet-club a {
+            color: inherit;
+            text-decoration: none;
+            font-size: inherit;
+            font-weight: inherit;
+            font-family: inherit;
+        }
+
+
+        
+    </style>
+</head>
+<body>
+    <header>
+        <a href="{{ url_for('traderopener') }}" class="back-button">← Back to Stock Exchange</a>
+        <h1>Options Portfolio</h1>
+    </header>
+
+    <section class="info-strip">
+        <div> Gameweek: {{ gameweek }}</div>
+        <div>💰 Bankroll: ${{ bankroll }}</div>
+        <div> Equity: ${{ equity }}</div>
+        <div id="options-equity-strip"> Options Equity: ${{ options_equity }}</div>
+        <div id="options-pnl-strip"><strong style="color: dodgerblue;">Total Options P&L:</strong>
+            {% set net = net_pnl %}
+            <span class="{% if net >= 0 %}green{% else %}red{% endif %}">
+                ${{ net }} (Realized: ${{ total_realized_pnl }}, Unrealized: ${{ total_unrealized_pnl }})
+            </span>
+        </div>
+    </section>
+
+    <div class="toggle-bar">
+        <button id="toggle-vanilla" onclick="toggleView('vanilla')">Vanilla Options</button>
+        <button id="toggle-obet" onclick="toggleView('obet')">Digital Options</button>
+    </div>
+
+    <div id="vanilla-options-view">
+        <section>
+            <h2>Active Options</h2>
+            {% if active_options|length == 0 %}
+                <p class="gray">(No active options)</p>
+            {% else %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Option</th>
+                            <th>Contracts</th>
+                            <th>Cost</th>
+                            <th>Current</th>
+                            <th>Change</th>
+                            <th>Total Cost</th>
+                            <th>Market Value</th>
+                            <th>Unrealized P&L</th>
+                            <th>Underlying</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for opt in active_options %}
+                        <tr>
+                            <td>{{ opt.club }} ${{ opt.strike }} {{ opt.type|capitalize }} GW-{{ opt.expiry }}</td>
+                            <td>{{ opt.contracts }}</td>
+                            <td>${{ opt.cost }}</td>
+                            <td class="yellow">${{ opt.curr }}</td>
+                            <td class="{% if opt.change >= 0 %}green{% else %}red{% endif %}">
+                                {{ '+' if opt.change >= 0 }}${{ opt.change }} ({{ opt.pct_change }}%)
+                            </td>
+                            <td>${{ opt.total_cost }}</td>
+                            <td>${{ opt.market_value }}</td>
+                            <td class="{% if opt.unrealized_pnl >= 0 %}green{% else %}red{% endif %}">
+                                {{ '+' if opt.unrealized_pnl >= 0 }}${{ opt.unrealized_pnl }}
+                            </td>
+                            <td>
+                                ${{ opt.underlying_price }}
+                                {% if opt.underlying_change is not none %}
+                                    <div class="{% if opt.underlying_change >= 0 %}green{% else %}red{% endif %}">
+                                        {{ '+' if opt.underlying_change >= 0 }}${{ opt.underlying_change }}
+                                        ({{ opt.underlying_pct_change }}%)
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td><button class="sell-btn" data-opt='{{ opt|tojson }}'>Sell</button></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </section>
+
+        <section>
+            <h2>Expired/Sold Options</h2>
+            {% if expired_options|length == 0 %}
+                <p class="gray">(No expired or sold options)</p>
+            {% else %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Option</th>
+                            <th>Contracts</th>
+                            <th>Cost</th>
+                            <th>Final Value</th>
+                            <th>Total Cost</th>
+                            <th>Proceeds</th>
+                            <th>Realized P&L</th>
+                            <th>Held Till Expiry</th>
+                            <th>Expired</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for opt in expired_options %}
+                        <tr>
+                            <td>{{ opt.club }} ${{ opt.strike }} {{ opt.type|capitalize }} GW-{{ opt.expiry }}</td>
+                            <td>{{ opt.contracts }}</td>
+                            <td>${{ opt.cost }}</td>
+                            <td>${{ opt.final_val }}</td>
+                            <td>${{ opt.total_cost }}</td>
+                            <td>${{ opt.proceeds }}</td>
+                            <td class="{% if opt.realized_pnl >= 0 %}green{% else %}red{% endif %}">
+                                {{ '+' if opt.realized_pnl >= 0 }}${{ opt.realized_pnl }} ({{ opt.realized_pct }}%)
+                            </td>
+                            <td>{{ 'Yes' if opt.held_to_expiry else 'No' }}</td>
+                            <td>{{ opt.expired_nature }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </section>
+    </div>
+
+    <div id="obet-view" style="display: none;">
+        <div class="sub-toggle-bar">
+            <button id="sub-toggle-active" onclick="toggleObetSubview('active')">Active Bets</button>
+            <button id="sub-toggle-finished" onclick="toggleObetSubview('finished')">Finished Bets</button>
+        </div>
+
+        <div class="digital-active-summary">
+          <span class="das-label">Net Upside:</span>
+          <span class="das-value upside">${{ net_upside }}</span>
+          <span class="das-label">Net Downside:</span>
+          <span class="das-value downside">${{ net_downside }}</span>
+        </div>
+
+        <div id="active-obets" class="obet-grid">
+            {% for bet in active_obets %}
+            <div class="obet-card">
+                <div class="obet-top">
+                    <div>{{ bet.obet_type }} {{ bet.obet_strike }}</div>
+                    <div>{{ '+' if bet.obet_odds > 0 else '' }}{{ bet.obet_odds }}</div>
+                </div>
+                <div class="gray">GW-{{ bet.obet_expiry }}</div>
+                <a href="{{ url_for('oneclub', clubname=bet.obet_underlying) }}" class="obet-club">
+                    {{ bet.obet_underlying }}
+                </a>
+                <div class="obet-bottom">
+                    <div>Stake: ${{ bet.obet_size }}</div>
+                    <div><strong style="color: #008080;">Potential Payout: ${{ bet.obet_potential_payout }}</strong></div>
+                </div>
+                {% if bet.obet_expiry == gameweek %}
+                <div class="yellow" style="font-size:14px; margin-top:8px;">
+                    ⚠ Expiring This Week!
+                </div>
+                {% else %}
+                <div class="blue" style="font-size:14px; margin-top:8px;">
+                    ESL Trade Digital Option
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="digital-summary">
+        <span class="summary-label">Total Profits:</span>
+        <span class="summary-value profit">${{ netprofits }}</span>
+        <span class="summary-label">Total Losses:</span>
+        <span class="summary-value losses">${{ netlosses }}</span>
+        <span class="summary-label">Net P&L:</span>
+        <span class="summary-value net">${{ netpandl }}</span>
+        </div>
+
+
+        <div id="finished-obets" class="obet-grid" style="display: none;">
+
+        {% for bet in finished_obets %}
+            <div class="obet-card {% if bet.result == 'Won' %}win{% else %}loss{% endif %}">
+            <div class="obet-top">
+                <div>{{ bet.obet_type }} {{ bet.obet_strike }}</div>
+                <div>{{ '+' if bet.obet_odds > 0 else '' }}{{ bet.obet_odds }}</div>
+            </div>
+
+            <div class="gray">GW-{{ bet.obet_expiry }}</div>
+            <div class="gray">Underlying at Expiry: ${{ bet.underlying_finished }}</div>
+
+            <a href="{{ url_for('oneclub', clubname=bet.obet_underlying) }}" class="obet-club">
+                {{ bet.obet_underlying }}
+            </a>
+
+            <div class="obet-bottom">
+                <div>Stake: ${{ bet.obet_size }}</div>
+                <div>
+                {% if bet.result == 'Won' %}
+                    <strong style="color: #00c853;">Won ${{ bet.obet_potential_payout }}</strong>
+                {% else %}
+                    <strong style="color: #ff5252;">Lost</strong>
+                {% endif %}
+                </div>
+            </div>
+            </div>
+        {% endfor %}
+        </div>
+
+    </div>
+
+
+
+    <div id="sellSlip" class="sell-slip hidden">
+    <div class="slip-content">
+        <span class="close-btn" onclick="closeSlip()">×</span>
+        <h2>Sell Option</h2>
+        <p><strong>Option:</strong> <span id="slipOptionText"></span></p>
+        <p><strong>Gameweek:</strong> {{ gameweek }}</p>
+        <p><strong>Underlying Price:</strong> $<span id="slipUnderlying"></span></p>
+        <p><strong>Ask Price (1.2% below market):</strong> $<span id="slipAskPrice" class="yellow"></span></p>
+
+        <label for="contractsToSell">Contracts to Sell:</label>
+        <input type="number" id="contractsToSell" min="1" oninput="updateSellValue()" />
+        <p id="insufficientContracts" class="red hidden">Insufficient Contracts</p>
+
+        <p><strong>Market Value:</strong> $<span id="marketValueDisplay" class="green">0.00</span></p>
+
+        <button id="confirmSell" class="sell-btn" onclick="submitSell()">Confirm Sell</button>
+    </div>
+    </div>
+
+    <script>
+        let currentOption = {};
+
+        function openSellSlip(optionData) {
+            currentOption = optionData;
+            document.getElementById("slipOptionText").textContent = `${optionData.club} $${optionData.strike} ${optionData.type.toUpperCase()} GW-${optionData.expiry}`;
+            document.getElementById("slipUnderlying").textContent = optionData.underlying_price;
+            document.getElementById("slipAskPrice").textContent = (optionData.curr * 0.988).toFixed(2);
+            document.getElementById("contractsToSell").value = '';
+            document.getElementById("marketValueDisplay").textContent = "0.00";
+            document.getElementById("insufficientContracts").classList.add("hidden");
+
+            document.getElementById("sellSlip").classList.remove("hidden");
+        }
+
+        function closeSlip() {
+            document.getElementById("sellSlip").classList.add("hidden");
+        }
+
+        function updateSellValue() {
+            const num = parseInt(document.getElementById("contractsToSell").value);
+            const ask = currentOption.curr * 0.988;
+            if (isNaN(num) || num <= 0) {
+                document.getElementById("marketValueDisplay").textContent = "0.00";
+                document.getElementById("insufficientContracts").classList.add("hidden");
+                return;
+            }
+            const marketValue = (ask * 100 * num).toFixed(2);
+            document.getElementById("marketValueDisplay").textContent = marketValue;
+            if (num > currentOption.contracts) {
+                document.getElementById("insufficientContracts").classList.remove("hidden");
+            } else {
+                document.getElementById("insufficientContracts").classList.add("hidden");
+            }
+        }
+
+        function submitSell() {
+            const contracts = parseInt(document.getElementById("contractsToSell").value);
+            if (!contracts || contracts <= 0 || contracts > currentOption.contracts) {
+                return;
+            }
+            fetch("/sell_option", {
+                method: "POST",
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    holding_id: currentOption.id,
+                    contracts: contracts
+                })
+            }).then(res => {
+                if (res.ok) {
+                    window.location.reload();
+                } else {
+                    alert("Error processing sell order.");
+                }
+            });
+        }
+
+        // Attach click handlers
+        document.addEventListener("DOMContentLoaded", () => {
+            const sellButtons = document.querySelectorAll(".sell-btn[data-opt]");
+            sellButtons.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const option = JSON.parse(btn.dataset.opt.replace(/'/g, '"'));
+                    openSellSlip(option);
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

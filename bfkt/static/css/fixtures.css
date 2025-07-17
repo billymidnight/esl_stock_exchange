@@ -1,0 +1,154 @@
+/* Dark Themed Styling for Fixtures Page */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #0d1117;
+    color: #c9d1d9;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    text-align: center;
+    background-color: #1c2128;
+    color: #fff;
+    padding: 20px;
+    border-bottom: 2px solid #30363d;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.back-button {
+    display: inline-block;
+    background-color: #30363d;
+    color: #c9d1d9;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 16px;
+    margin-top: 10px;
+    font-weight: 600;
+}
+
+.back-button:hover {
+    background-color: #58a6ff;
+}
+
+/* Most Recent Result Section */
+.recent-result {
+    background-color: #161b22;
+    padding: 20px;
+    margin: 20px auto;
+    width: 80%;
+    border-radius: 8px;
+    border: 1px solid #30363d;
+    text-align: center;
+}
+
+.recent-result h2 {
+    margin-bottom: 20px;
+    color: #58a6ff;
+}
+
+.match-result {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+}
+
+.team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.team-logo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+    background-color: #0d1117;
+    border: 4px solid transparent;
+}
+
+.goals {
+    font-size: 2em;
+    font-weight: bold;
+    color: #f0f6fc;
+}
+
+.vs {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #c9d1d9;
+}
+
+/* Win, Lose, Draw Borders */
+.win .team-logo {
+    border-color: #00c853;
+}
+
+.lose .team-logo {
+    border-color: #ff4d4d;
+}
+
+.draw .team-logo {
+    border-color: #9e9e9e;
+}
+
+.result {
+    font-size: 1.2em;
+    margin-top: 10px;
+    color: #c9d1d9;
+    font-weight: bold;
+}
+
+/* Past Fixtures Section */
+.past-fixtures {
+    width: 80%;
+    margin: 20px auto;
+}
+
+.past-fixtures h2 {
+    text-align: center;
+    color: #58a6ff;
+}
+
+.past-fixtures h3 {
+    margin: 20px 0 10px;
+    color: #c9d1d9;
+}
+
+.match {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #161b22;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border: 1px solid #30363d;
+}
+
+.match .team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+}
+
+.match .team-logo {
+    width: 100px;
+    height: 100px;
+}
+
+.match .vs {
+    font-size: 1.2em;
+    color: #c9d1d9;
+    margin: 0 15px;
+}

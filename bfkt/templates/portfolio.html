@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Full Portfolio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/portfolio.css') }}">
+</head>
+<body>
+    <header>
+        <a href="{{ url_for('traderopener') }}" class="back-button">← Back to Exchange</a>
+        <h1>Your Portfolio</h1>
+    </header>
+
+    <section class="summary">
+        <div class="summary-info">Total Equity: ${{ equity }}</div>
+        <div class="summary-info">Cash Bankroll: ${{ bankroll }}</div>
+    </section>
+
+    <section class="equity-graph-section">
+        <div class="equity-header">
+            <span class="equity-label">Equity: ${{ equity }}</span>
+            <div class="graph-tabs">
+                <button onclick="showGraph('last1')" class="tab-btn active">Current GW</button>
+                <button onclick="showGraph('last10')" class="tab-btn">Last 10 GWs</button>
+                <button onclick="showGraph('last20')" class="tab-btn">Last 20 GWs</button>
+                <button onclick="showGraph('alltime')" class="tab-btn">All Time</button>
+            </div>
+        </div>
+    
+        <div class="equity-change-display">
+            <span id="equity-change-value" class="{{ 'green' if equity_graphs['last1'].dollar >= 0 else 'red' }}">
+                {% if equity_graphs['last1'].dollar >= 0 %}+{% endif %}${{ equity_graphs['last1'].dollar }} 
+                ({{ equity_graphs['last1'].percent }}%)
+            </span>
+        </div>
+    
+        <div class="equity-graph-display">
+            <img id="equity-graph-img" src="{{ url_for('static', filename='images/graphs/' + equity_graphs['last1'].filename) }}" alt="Equity Trend" class="equity-graph-img">
+        </div>
+    </section>
+
+    {% for holding in holdings %}
+    <div class="holding-card">
+        <div class="holding-top">
+            <img src="{{ url_for('static', filename='images/' + holding.filename) }}" class="club-logo" alt="{{ holding.club_name }}">
+            <a href="{{ url_for('oneclub', clubname=holding.club_name) }}" class="club-name">{{ holding.club_name }}</a>
+            <div class="metric"><strong>Price:</strong> ${{ holding.price }}</div>
+            <div class="metric"><strong>This Gameweek:</strong>
+                {% if holding.dollar_change == 0 %}
+                    <span class="gray">Yet to play</span>
+                {% else %}
+                    <span class="{{ 'green' if holding.dollar_change > 0 else 'red' }}">
+                        {% if holding.dollar_change > 0 %}+{% endif %}${{ holding.dollar_change }} ({{ holding.percent_change }}%)
+                    </span>
+                {% endif %}
+            </div>
+            <div class="metric"><strong>All-Time:</strong>
+                <span class="{{ 'green' if holding.returns_dollar > 0 else 'red' }}">
+                    {% if holding.returns_dollar >= 0 %}+{% endif %}${{ holding.returns_dollar }} ({{ holding.returns_percent }}%)
+                </span>
+            </div>
+            <div class="metric"><strong>Shares Held:</strong> {{ holding.volume }}</div>
+            <div class="metric"><strong>Avg Cost:</strong> ${{ holding.avg_cost }}</div>
+            <div class="metric"><strong>Total Cost:</strong> ${{ holding.total_cost }}</div>
+            <div class="metric"><strong>Market Value:</strong> ${{ holding.value }}</div>
+            <div class="metric"><strong>Returns:</strong>
+                <span class="{{ 'green' if holding.total_return >= 0 else 'red' }}">
+                    {% if holding.total_return >= 0 %}+{% endif %}${{ holding.total_return }} ({{ holding.total_return_pct }}%)
+                </span>
+            </div>
+        </div>
+
+        <button class="toggle-btn" onclick="toggleHistory('{{ holding.club_name }}')">View Your {{ holding.club_name }} Trading History ↓</button>
+
+        <div class="transaction-history" id="history-{{ holding.club_name }}" style="display: none;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Gameweek</th>
+                        <th>Action</th>
+                        <th>Volume</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tx in holding.transactions %}
+                    <tr>
+                        <td>{{ tx.gameweek }}</td>
+                        <td>{{ tx.action }}</td>
+                        <td>{{ tx.volume_traded }}</td>
+                        <td>${{ tx.underlying_price }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endfor %}
+
+    <section class="pie-section">
+        <img src="{{ url_for('static', filename='images/graphs/' + piechart_filename) }}" alt="Holdings Pie Chart" class="pie-chart">
+    </section>
+
+    <script>
+        function toggleHistory(clubName) {
+            const el = document.getElementById(`history-${clubName}`);
+            const btn = el.previousElementSibling;
+            if (el.style.display === "none") {
+                el.style.display = "block";
+                btn.innerText = `Collapse ${clubName} History ↑`;
+            } else {
+                el.style.display = "none";
+                btn.innerText = `View ${clubName} History ↓`;
+            }
+        }
+
+        const equityGraphs = {{ equity_graphs | tojson }};
+        function showGraph(label) {
+            const img = document.getElementById("equity-graph-img");
+            const change = document.getElementById("equity-change-value");
+
+            const meta = equityGraphs[label];
+            img.src = "/static/images/graphs/" + meta.filename;
+
+            change.textContent = `${meta.dollar >= 0 ? '+' : ''}$${meta.dollar} (${meta.percent}%)`;
+            change.className = meta.dollar >= 0 ? 'green' : 'red';
+
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const labelMap = {
+                "last1": "Current GW",
+                "last10": "Last 10 GWs",
+                "last20": "Last 20 GWs",
+                "alltime": "All Time"
+            };
+            const activeBtn = [...document.querySelectorAll('.tab-btn')].find(b => b.textContent.trim() === labelMap[label]);
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+    </script>
+</body>
+</html>

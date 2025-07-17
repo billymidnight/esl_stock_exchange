@@ -1,0 +1,106 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    text-align: center;
+    background-color: #333;
+    color: white;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5em;
+}
+
+.winner-section {
+    text-align: center;
+    margin: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.winner-photo {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    margin: 10px 0;
+}
+
+.winner-name {
+    font-size: 2.5em;
+    color: #4CAF50;
+    margin: 10px 0;
+}
+
+.winner-year {
+    font-size: 1.5em;
+    color: #777;
+}
+
+.standings-section {
+    margin: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.standings-section h2 {
+    text-align: center;
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+th {
+    background-color: #444;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+.end-season-section {
+    text-align: center;
+    margin: 20px;
+    padding: 20px;
+}
+
+.end-season-button {
+    padding: 15px 30px;
+    font-size: 1.5em;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.end-season-button:hover {
+    background-color: #d32f2f;
+}

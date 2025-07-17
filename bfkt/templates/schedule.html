@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BFKT Match Schedule</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/schedule.css') }}">
+</head>
+<body>
+    <header>
+        <h1>BFKT Gameweek Schedule</h1>
+        <a href="{{ url_for('show_standings') }}" class="schedule-button">Home</a>
+        <a href="{{ url_for('pastwinners') }}" class="schedule-button">Past Winners</a>
+    </header>
+
+    <main>
+        <table>
+            <thead>
+                <tr>
+                    <th>Home Team</th>
+                    <th>vs</th>
+                    <th>Away Team</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for match in matches %}
+                <tr>
+                    <td class="team">
+                        <img src="{{ url_for('static', filename='images/' + match.homepic) }}" alt="{{ match.home }} Logo">
+                        <span>{{ match.home }}</span>
+                    </td>
+                    <td>vs</td>
+                    <td class="team">
+                        <img src="{{ url_for('static', filename='images/' + match.awaypic) }}" alt="{{ match.away }} Logo">
+                        <span>{{ match.away }}</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
+    <meta http-equiv="Content-Language" content="en">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESL Stock Exchange</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tickerscreen.css') }}">
+</head>
+<body>
+    <header>
+        <a href="{{ url_for('show_standings') }}" class="back-button">← Home</a>
+        <h1>ESL Stock Exchange</h1>
+        <img src="{{ url_for('static', filename='images/tradelogo.png') }}" alt="Trade Logo" class="trade-logo">
+    </header>
+
+    <div class="equity-display">
+        Equity: ${{ equity }}
+    </div>
+    
+    <div class="ticker-container">
+        <div class="ticker-track" id="ticker-track">
+            {% for tick in ticker_data %}
+                <span class="ticker-item">
+                    <strong>{{ tick.club }}</strong>: ${{ tick.price }} —
+                    <span class="{{ 'green' if '+' in tick.change else 'red' if '-' in tick.change else 'gray' }}">
+                        {{ tick.change }}
+                    </span>
+                </span>
+            {% endfor %}
+            {% for tick in ticker_data %}
+                <span class="ticker-item">
+                    <strong>{{ tick.club }}</strong>: ${{ tick.price }} —
+                    <span class="{{ 'green' if '+' in tick.change else 'red' if '-' in tick.change else 'gray' }}">
+                        {{ tick.change }}
+                    </span>
+                </span>
+            {% endfor %}
+        </div>
+    </div>
+    
+    
+
+    <section class="portfolio-section">
+        <div class="portfolio-header">
+            <h2>Stock Portfolio</h2>
+            <a href="{{ url_for('portfolio_viewer') }}" class="portfolio-link">View Full Portfolio →</a>
+        </div>
+    
+        {% if holdings|length == 0 %}
+            <p>(No holdings yet)</p>
+        {% else %}
+            <div class="portfolio-list" id="portfolioList">
+                {% for holding in holdings[:2] %}
+                    <div class="portfolio-item">
+                        <div class="portfolio-club">{{ holding.club_name }}</div>
+                        <div class="portfolio-metrics">
+                            <span class="metric">Held: {{ holding.volume }}</span>
+                            <span class="metric">Value: ${{ holding.value }}</span>
+                            {% if holding.dollar_change is not none %}
+                                <span class="metric change {% if holding.dollar_change >= 0 %}green{% else %}red{% endif %}">
+                                    {% if holding.dollar_change >= 0 %}+{% endif %}${{ holding.dollar_change }} ({{ holding.percent_change }}%)
+                                </span>
+                            {% else %}
+                                <span class="metric gray">Yet to play this gameweek</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+    
+            {% if holdings|length > 2 %}
+                <button class="toggle-btn" id="toggleBtn" onclick="togglePortfolio()">Show All ↓</button>
+            {% endif %}
+        {% endif %}
+    </section>
+    
+    <!-- OPTIONS PORTFOLIO SECTION -->
+    <section class="portfolio-section">
+        <div class="portfolio-header">
+            <h2>Options Portfolio</h2>
+            <a href="{{ url_for('options_portfolio') }}" class="portfolio-link">View Full Portfolio →</a>
+        </div>
+    
+        {% if options_holdings|length == 0 %}
+            <p>(No option contracts held)</p>
+        {% else %}
+            <div class="portfolio-list" id="optionsList">
+                <!-- JS will fully render the 2 or more options -->
+            </div>
+    
+            {% if options_holdings|length > 2 %}
+                <button class="toggle-btn" id="toggleOptionsBtn" onclick="toggleOptions()">Show All ↓</button>
+            {% endif %}
+        {% endif %}
+    </section>
+    
+    
+
+    <section class="club-grid">
+        {% for club in clubs %}
+        <a href="{{ url_for('oneclub', clubname=club.name) }}" class="club-box">
+            <img src="{{ url_for('static', filename='images/' + club.filename) }}" class="club-logo" alt="{{ club.name }}">
+            <div class="club-name">{{ club.name }}</div>
+            <div class="club-price">${{ club.price }}</div>
+            <div class="club-position">Position: {{ club.position }}</div>
+        </a>
+        {% endfor %}
+    </section>
+
+    <script>
+        let expanded = false;
+        function togglePortfolio() {
+            const portfolioList = document.getElementById('portfolioList');
+            const toggleBtn = document.getElementById('toggleBtn');
+            const holdings = {{ holdings|tojson }};
+            const displayCount = expanded ? 2 : holdings.length;
+
+            portfolioList.innerHTML = '';
+            for (let i = 0; i < displayCount; i++) {
+                const h = holdings[i];
+                const changeText = h.dollar_change === null || parseFloat(h.dollar_change) === 0
+                    ? `<span class="metric gray">Yet to play this gameweek</span>`
+                    : `<span class="metric change ${h.dollar_change >= 0 ? 'green' : 'red'}">${h.dollar_change >= 0 ? '+' : ''}$${h.dollar_change} (${h.percent_change}%)</span>`;
+
+                portfolioList.innerHTML += `
+                    <div class="portfolio-item">
+                        <div class="portfolio-club">${h.club_name}</div>
+                        <div class="portfolio-metrics">
+                            <span class="metric">Held: ${h.volume}</span>
+                            <span class="metric">Value: $${h.value}</span>
+                            ${changeText}
+                        </div>
+                    </div>`;
+            }
+
+            toggleBtn.innerText = expanded ? "Show All ↓" : "Collapse ↑";
+            expanded = !expanded;
+        }
+
+        let expandedOptions = false;
+        function toggleOptions() {
+            const optionsList = document.getElementById('optionsList');
+            const toggleBtn = document.getElementById('toggleOptionsBtn');
+            const options = {{ options_holdings|tojson }};
+            const displayCount = expandedOptions ? 2 : options.length;
+
+            optionsList.innerHTML = '';
+            for (let i = 0; i < displayCount; i++) {
+                const opt = options[i];
+                const changeColor = opt.dollar_change >= 0 ? "green" : "red";
+
+                const expiringText = opt.expiring_this_week
+                    ? `<div class="metric yellow" style="font-size: 13px; margin-bottom: 4px;">⚠ Expiring This Week!</div>`
+                    : "";
+
+                optionsList.innerHTML += `
+                    <div class="portfolio-item">
+                        <div class="portfolio-club">${opt.club} $${opt.strike} ${opt.type.charAt(0).toUpperCase() + opt.type.slice(1)} GW-${opt.expiry}</div>
+                        ${expiringText}
+                        <div class="portfolio-metrics">
+                            <span class="metric">Contracts Held: ${opt.contracts}</span>
+                            <span class="metric">Cost: $${opt.cost}</span>
+                            <span class="metric yellow">Price: $${opt.curr}</span>
+                            <span class="metric">Market Value: $${opt.market_value}</span>
+                            <span class="metric change ${changeColor}">${opt.dollar_change >= 0 ? '+' : ''}$${opt.dollar_change} (${opt.percent_change}%)</span>
+                        </div>
+                    </div>`;
+            }
+
+            toggleBtn.innerText = expandedOptions ? "Show All ↓" : "Collapse ↑";
+            expandedOptions = !expandedOptions;
+        }
+
+        // ✅ FIXED: RENDER FIRST TWO WITHOUT IMMEDIATELY COLLAPSING
+        document.addEventListener("DOMContentLoaded", () => {
+            expandedOptions = true;
+            toggleOptions();
+            expandedOptions = false;
+        });
+    </script>
+    
+</body>
+</html>

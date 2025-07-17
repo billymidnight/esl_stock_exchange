@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sportsbook - League Winner Futures</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sportsbook.css') }}">
+    <script>
+        function openBetForm(participantName, odds) {
+            // Populate the popup form with participant name and odds
+            document.getElementById('participantName').innerText = participantName;
+            document.getElementById('oddsValue').innerText = '+' + odds;
+            document.getElementById('participantInput').value = participantName;
+            document.getElementById('oddsInput').value = odds;
+
+            // Show the popup form
+            document.getElementById('betFormPopup').style.display = 'block';
+        }
+
+        function closeBetForm() {
+            // Hide the popup form
+            document.getElementById('betFormPopup').style.display = 'none';
+        }
+
+        function showBetPlacedMessage() {
+            // Show success message after placing bet
+            alert("Bet Placed Successfully");
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>League Winner Futures</h1>
+        <div class="header-buttons">
+            <a href="{{ url_for('show_standings') }}" class="header-link home-link">Home</a>
+            <a href="{{ url_for('mybets_viewer') }}" class="header-link bets-link">My Bets</a>
+        </div>
+    </header>
+
+    <main>
+        <table>
+            <thead>
+                <tr>
+                    <th>Participant</th>
+                    <th>Odds</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for participant in odds %}
+                <tr>
+                    <td class="participant" onclick="openBetForm('{{ participant.name }}', '{{ participant.odds }}')">
+                        <img src="{{ url_for('static', filename='images/' + participant.filename) }}" alt="{{ participant.name }} Picture">
+                        <span>{{ participant.name }}</span>
+                    </td>
+                    <td>
+                        +{{ participant.odds }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+
+    <!-- Popup Bet Form -->
+    <div id="betFormPopup">
+        <div class="popup-content">
+            <h2>Place Your Bet</h2>
+            <p>Participant: <span id="participantName"></span></p>
+            <p>Odds: <span id="oddsValue"></span></p>
+            <form action="{{ url_for('bet_handler') }}" method="POST" onsubmit="showBetPlacedMessage()">
+                <input type="hidden" name="participant" id="participantInput">
+                <input type="hidden" name="odds" id="oddsInput">
+                <input type="hidden" name="type" value="futures">
+                <label for="stake">Enter Stake ($):</label>
+                <input type="number" id="stake" name="stake" min="1" required>
+                <div class="form-actions">
+                    <button type="submit">Place Bet</button>
+                    <button type="button" onclick="closeBetForm()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

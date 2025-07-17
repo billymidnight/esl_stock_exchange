@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BFKT Match Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fixtures.css') }}">
+</head>
+<body>
+    <header>
+        <h1>BFKT Match Results</h1>
+        <a href="{{ url_for('show_standings') }}" class="back-button">Back to Standings</a>
+    </header>
+
+    <main>
+        <!-- Most Recent Result -->
+        <section class="recent-result">
+            <h2>Most Recent Result</h2>
+            <div class="match-result">
+                <div class="team {{ 'win' if matches[0].home_goals > matches[0].away_goals else ('draw' if matches[0].home_goals == matches[0].away_goals else 'lose') }}">
+                    <img src="{{ url_for('static', filename='images/' + matches[0].homepic) }}" alt="{{ matches[0].home }} Logo" class="team-logo">
+                    <span class="team-name">{{ matches[0].home }}</span>
+                    <span class="goals">{{ matches[0].home_goals }}</span>
+                </div>
+                <span class="vs">vs</span>
+                <div class="team {{ 'win' if matches[0].away_goals > matches[0].home_goals else ('draw' if matches[0].home_goals == matches[0].away_goals else 'lose') }}">
+                    <img src="{{ url_for('static', filename='images/' + matches[0].awaypic) }}" alt="{{ matches[0].away }} Logo" class="team-logo">
+                    <span class="team-name">{{ matches[0].away }}</span>
+                    <span class="goals">{{ matches[0].away_goals }}</span>
+                </div>
+            </div>
+            <p class="result">
+                {% if matches[0].home_goals > matches[0].away_goals %}
+                    {{ matches[0].home }} wins
+                {% elif matches[0].home_goals < matches[0].away_goals %}
+                    {{ matches[0].away }} wins
+                {% else %}
+                    Draw
+                {% endif %}
+            </p>
+        </section>
+
+        <!-- Past Fixtures by Gameweek -->
+        <section class="past-fixtures">
+            <h2>Past Fixtures</h2>
+        
+            {% for week in grouped_matches %}
+                <div class="gw-block">
+                    <h3 class="gw-label">Gameweek {{ week[0].gameweek }}</h3>
+        
+                    {% for match in week %}
+                        <div class="match">
+                            <div class="team">
+                                <img src="{{ url_for('static', filename='images/' + match.homepic) }}" alt="{{ match.home }} Logo" class="team-logo">
+                                <span class="team-name">{{ match.home }}</span>
+                                <span class="goals">{{ match.home_goals }}</span>
+                            </div>
+                            <span class="vs">vs</span>
+                            <div class="team">
+                                <img src="{{ url_for('static', filename='images/' + match.awaypic) }}" alt="{{ match.away }} Logo" class="team-logo">
+                                <span class="team-name">{{ match.away }}</span>
+                                <span class="goals">{{ match.away_goals }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </section>
+        
+        
+    </main>
+</body>
+</html>
