@@ -87,7 +87,6 @@ def sell_option():
     premium_now = option["curr_premium"]
     market_value = premium_now * 100 * contracts_to_sell
 
-    # Update bankroll
     con.execute("UPDATE equity SET bankroll = bankroll + ?", (market_value,))
 
     current_gw = con.execute("SELECT gameweek FROM status").fetchone()["gameweek"]

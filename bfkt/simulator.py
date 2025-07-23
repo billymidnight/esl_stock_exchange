@@ -377,7 +377,7 @@ def results_generator():
             homerating, awayrating, homegoals, awaygoals
         )
         print(f"the home mu is {mu_home} and the away my is {mu_away}")
-        weight_sample = min(max(random.gauss(69, 6.8), 0), 100)
+        weight_sample = min(max(random.gauss(91, 6.8), 0), 100)
         print(f"weight sample was {weight_sample}")
         mu_home_final = mu_home if random.uniform(0, 100) <= weight_sample else mu_home_char
         print("mu_home_final was ", mu_home_final)
@@ -676,7 +676,8 @@ def gameweek_sim():
             con.execute(
                 "INSERT INTO points_history (name, gameweek, points) VALUES (?, ?, ?)",
                 (club, gw, current_points)
-            )
+            )  
+        #simulation
 
         home_data = con.execute(
             "SELECT drift, volatility FROM participants WHERE name = ?", (home,)
