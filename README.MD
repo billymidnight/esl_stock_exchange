@@ -187,5 +187,5 @@ Open [http://localhost:5000](http://localhost:5000) in your browser.
 
 ## License
 
-MIT © Your Name / Organization
+MIT © M.K.Pritesh
 
